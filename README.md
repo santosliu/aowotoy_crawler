@@ -1,2 +1,38 @@
-# aowotoy_crawler
-aowotoy_crawler
+# toybox-crawler
+
+- 爬取指定網頁
+  - https://shop35283664.world.taobao.com/?spm=pc_detail.29232929.shop_block.dshopinfo.6a747dd6BFC0gG
+  - (done) https://www.aowotoys.com/categories/aowobox-displaybox?sort_by=created_at&order_by=desc&limit=72&page= 
+- 存入資料庫
+- 輸出指定 csv 格式
+  - (done) ruten
+  - shopee
+  - jolly
+- 輸出到指定網站
+
+# 不上架商品
+
+- 先上所有商品
+- 取得本賣家所有商品
+- 依照商品上圖片
+
+- 選項有 無需拼裝一體式
+- 選項有 無需拼裝
+- 選項有 透明無噴繪
+- 標題 有「預售」
+- 標題 有「解放玩具」
+
+先篩選這五種的不上架就可以了
+
+# 待處理
+
+中文字網址 https://www.aowotoys.com/products/aowobox-%E9%AB%98%E9%80%8F%E6%89%8B%E8%BE%A6%E4%B8%BB%E9%A1%8C%E5%B1%95%E7%A4%BA%E7%9B%92-%E9%81%A9%E7%94%A8%E6%96%BC-%E6%93%8E%E8%92%BC%E5%B7%A5%E4%BD%9C%E5%AE%A4-%E6%B4%9B%E5%A4%A9%E4%BE%9D-%E6%A2%A8%E8%8A%B1%E9%9B%AAver%E6%89%8B%E8%BE%A6?locale=zh-hant
+
+No data fetched for product_id 66c4420fd2f6d7001f6b1c9b
+
+定期檢查新商品
+
+定期檢查預售商品修改狀況
+
+定期 rclone sync
+D:\Dropbox\01_工具程式\rclone-v1.69.3-windows-amd64>rclone sync \Code\toybox-crawler\products r2:toy --progress -v

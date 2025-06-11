@@ -1,0 +1,14 @@
+.venv
+.env
+item
+products
+*.csv
+*.zip
+*.json
+*.xlsx
+.pytest_cache
+/src/__pycache__/
+/tests/__pycache__/
+/output
+/node_modules
+/doc/ruten/api_sample
