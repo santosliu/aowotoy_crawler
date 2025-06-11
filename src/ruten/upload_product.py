@@ -9,46 +9,12 @@ import json
 import requests
 from dotenv import load_dotenv
 import logging
-from src.utils.db import connect_to_db
+from src.utils.db import get_unpublish_product
 import mysql.connector
 from src.utils.common import genSign # 從 common.py 導入 genSign 函數
 
 # 配置日誌記錄
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-def get_product_data():
-    mydb = None
-    cursor = None
-    try:
-        mydb = connect_to_db()
-        if mydb:
-            cursor = mydb.cursor(dictionary=True)
-            sql = "SELECT * FROM aowotoy_products WHERE product_id = '655ae4cca6e0d9001dcf8564'"
-            cursor.execute(sql)
-            product_data = cursor.fetchall()
-            if product_data:
-                logging.info(f"從資料庫獲取原始產品資料 (列表): {product_data}")
-                # product_data 是列表，即使只有一條記錄，也需要取第一個元素
-                # 返回所有產品資料列表
-                return product_data
-            else:
-                logging.info("資料庫中沒有待上傳的產品資料。")
-                return None
-        else:
-            logging.error("無法連接到資料庫，無法獲取產品資料。")
-            return None
-    except mysql.connector.Error as err:
-        logging.error(f"從資料庫獲取產品資料失敗: {err}")
-        return None
-    except Exception as e:
-        logging.error(f"獲取產品資料時發生未知錯誤: {e}")
-        return None
-    finally:
-        if cursor:
-            cursor.close()
-        if mydb:
-            mydb.close()
-            logging.info("資料庫連線已關閉。")
 
 def upload_product(product_data: dict):
     load_dotenv() 
@@ -61,7 +27,7 @@ def upload_product(product_data: dict):
     
     # 使用 genSign 函數生成簽名
     sign_bytes = genSign(url, product_data, str(timestamp))
-    logging.info(sign_bytes)
+    
     headers = {
         'User-Agent': user_agent,
         'X-RT-Key': api_key,
@@ -69,30 +35,30 @@ def upload_product(product_data: dict):
         'X-RT-Authorization': sign_bytes,
     }
 
-    logging.info(f'正在向 {url} 發送請求...')
-    response = requests.request("POST", url, headers=headers, json=product_data)
+    # logging.info(f'正在向 {url} 發送請求...')
+    # response = requests.request("POST", url, headers=headers, json=product_data)
 
-    logging.info(f'收到回應: {response.text}')
-    logging.info('腳本執行結束。')
+    # logging.info(f'收到回應: {response.text}')
+    # logging.info('腳本執行結束。')
 
-    # try:
-    #     response = requests.post(url, json=product_data, headers=headers)
-    #     response.raise_for_status() # Raise an exception for HTTP errors (4xx or 5xx)
-    #     logging.info(f"Product upload successful: {response.text}")
-    #     # {"status":"success","data":{"item_id":"22523776659295","custom_no":"64f2172741270d001184247e"},"error_code":null,"error_msg":null}
-    #     # 這段要回寫到資料庫中備存
-    # except requests.exceptions.RequestException as e:
-    #     logging.error(f"Request failed: {e}")
-    #     if hasattr(e, 'response') and e.response is not None:
-    #         logging.error(f"Status Code: {e.response.status_code}")
-    #         try:
-    #             error_response_text = e.response.content.decode('utf-8', errors='ignore')
-    #             error_data = json.loads(error_response_text)
-    #             logging.error(f"Response JSON: {json.dumps(error_data, ensure_ascii=False, indent=2)}")
+    try:
+        response = requests.post(url, json=product_data, headers=headers)
+        response.raise_for_status() # Raise an exception for HTTP errors (4xx or 5xx)
+        logging.info(f"Product upload successful: {response.text}")
+        # {"status":"success","data":{"item_id":"22523776659295","custom_no":"64f2172741270d001184247e"},"error_code":null,"error_msg":null}
+        # 這段要回寫到資料庫中備存
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Request failed: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            logging.error(f"Status Code: {e.response.status_code}")
+            try:
+                error_response_text = e.response.content.decode('utf-8', errors='ignore')
+                error_data = json.loads(error_response_text)
+                logging.error(f"Response JSON: {json.dumps(error_data, ensure_ascii=False, indent=2)}")
 
 
-    #         except (UnicodeDecodeError, json.JSONDecodeError):
-    #             logging.error(f"Response Text (raw): {e.response.content}")
+            except (UnicodeDecodeError, json.JSONDecodeError):
+                logging.error(f"Response Text (raw): {e.response.content}")
 
 if __name__ == '__main__':
     # 示例產品資料
@@ -148,9 +114,10 @@ if __name__ == '__main__':
         ]
     }
 
+    products_to_upload = get_unpublish_product()
     upload_product(product_data)
 
-    # products_to_upload = get_product_data()
+    
     # store_class_id = '6529089'  # 預設為泡泡瑪特的 store_class_id
     # if products_to_upload:
     #     logging.info("準備上傳以下產品資料:")
