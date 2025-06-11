@@ -1,4 +1,4 @@
-.venv
+venv
 .env
 item
 products
@@ -6,9 +6,8 @@ products
 *.zip
 *.json
 *.xlsx
-.pytest_cache
-/src/__pycache__/
-/tests/__pycache__/
 /output
 /node_modules
 /doc/ruten/api_sample
+__pycache__/
+*.pyc
