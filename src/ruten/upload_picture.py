@@ -8,6 +8,9 @@
 """
 
 import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
 import sys
 import time
 import requests
@@ -20,7 +23,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, '..', '..'))
 sys.path.insert(0, project_root)
 
-from src.utils.common import genSign_compact # 從 common.py 導入 genSign 函數
+from src.utils.common import genSign_compact 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -33,6 +36,11 @@ if __name__ == '__main__':
     api_key = os.getenv('RUTEN_API_KEY')
     timestamp = str(int(time.time()))
     user_agent = os.getenv('RUTEN_USER_AGENT', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36')
+
+
+    # 取得已經上架但是還沒上圖片的項目
+    # 回傳 ruten_id , product_id
+
 
     payload = {
         'item_id': '22523758244600'

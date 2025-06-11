@@ -19,7 +19,7 @@ import requests
 import logging
 from dotenv import load_dotenv
 from src.utils.common import genSign
-from src.utils.db import get_unpublish_product, set_product_published
+from src.utils.db import get_products_without_publish, set_product_published
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -132,7 +132,22 @@ if __name__ == '__main__':
 
     ##### 以上為測試用 #####
 
-    products_to_upload = get_unpublish_product()
+
+    """
+
+    以下不用上架
+
+    選項有 無需拼裝一體式
+    選項有 無需拼裝
+    選項有 透明無噴繪
+    標題 有「預售」
+    標題 有「解放玩具」
+
+    找到之後回寫錯誤狀態
+
+    """
+
+    products_to_upload = get_products_without_publish()
 
     store_class_id = '6529089'  # 預設為泡泡瑪特的 store_class_id
     if products_to_upload:

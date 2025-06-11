@@ -19,7 +19,15 @@ def connect_to_db():
         print(f"資料庫連線失敗：{err}")
         return None
 
-def get_unpublish_product():
+def get_products_without_picture():
+
+    return ''
+
+def set_product_pictured(product_id,ruten_id):
+
+    return ''
+
+def get_products_without_publish():
     mydb = None
     cursor = None
     try:
