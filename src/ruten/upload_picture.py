@@ -20,7 +20,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, '..', '..'))
 sys.path.insert(0, project_root)
 
-from src.utils.common import genSign # 從 common.py 導入 genSign 函數
+from src.utils.common import genSign_compact # 從 common.py 導入 genSign 函數
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     ('images[]', ('test2.jpg', open('doc/pic/test2.jpg', 'rb'), 'image/jpeg')),
     ]
 
-    sign_bytes = genSign(url, payload, timestamp)
+    sign_bytes = genSign_compact(url, payload, timestamp)
 
     headers = {
         'User-Agent' : user_agent,
