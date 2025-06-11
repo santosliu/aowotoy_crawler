@@ -2,6 +2,7 @@ import csv
 import os
 import re
 import mysql.connector
+from src.utils.common import raisedPrice,replaceTitle,replaceDetail,replaceOption
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -97,8 +98,7 @@ def export_csv_by_product_id(product_id):
                 product_option = product_option.replace('只售展盒，不含展品', '').replace('+', '').replace(' ','')
                 
                 # 按照要求提高價格到 1.6 倍並取整到最接近的 10 的倍數
-                calculated_price = round(product_price * 1.6)
-                final_price = calculated_price - (calculated_price % 10)
+                final_price = raisedPrice(product_price)
 
                 # 把 product_option 和 final_price 置入 options
                 options[product_option] = final_price
@@ -119,40 +119,13 @@ def export_csv_by_product_id(product_id):
 
     # 如果 product_name 有 預購 或者 解放玩具 就跳出
     if "預購" in product_name or"預售" in product_name or "解放玩具" in product_name:
-        print(f"產品名稱包含 '預購' '預售' '解放玩具'，跳過匯出：{product_name}")
+        # print(f"產品名稱包含 '預購' '預售' '解放玩具'，跳過匯出：{product_name}")
         return
 
     # 取代文字
-    product_name = product_name.replace('高達', '鋼彈')
-    product_name = product_name.replace('手辦', '專用')
-    product_name = product_name.replace('AOWOBOX', '阿庫力')
-    product_name = product_name.replace('Good Smile', '好微笑')
-    product_name = product_name.replace('良笑社', '')
-    product_name = product_name.replace('高透主題展示盒', '主題展示盒')
-    product_name = product_name.replace('高透射燈主題展示盒', '主題展示盒')    
-
-    product_detail = product_detail.replace(' ', '')
-    product_detail = product_detail.replace('高達', '鋼彈')
-    product_detail = product_detail.replace('手辦', '專用')
-    product_detail = product_detail.replace('AOWOBOX', '阿庫力')
-    product_detail = product_detail.replace('Good Smile', '好微笑')
-    product_detail = product_detail.replace('良笑社', '')
-    product_detail = product_detail.replace('高透主題展示盒', '')
-    product_detail = product_detail.replace('高透射燈主題展示盒', '')   
-
-    # product_detail 使用 re 取代 
-    # from size:W25 cm D20cm H30cm
-    # to 尺寸: 長30cm 寬25cm 高45cm
-    product_detail = product_detail.replace('size', '尺寸')   
-    product_detail = product_detail.replace('Size', '尺寸')   
-    product_detail = re.sub(r'W(\d+)cm', r'寬\1cm', product_detail)
-    product_detail = re.sub(r'H(\d+)cm', r'高\1cm', product_detail)
-    product_detail = re.sub(r'D(\d+)cm', r'長\1cm', product_detail)
-    product_detail = re.sub(r'W(\d+)', r'寬\1', product_detail)
-    product_detail = re.sub(r'H(\d+)', r'高\1', product_detail)
-    product_detail = re.sub(r'D(\d+)', r'長\1', product_detail)
-    product_detail = re.sub(r'鋼彈(\d+)%', r'高達\1%', product_detail)
-
+    product_name = replaceTitle(product_name)
+    product_detail = replaceDetail(product_detail)
+    
     total_count = len(options)*10
 
     row = f'172130,{product_name},{preset_price},,,{total_count},,,1,0,,2,2,,壓克力展示盒（Aowobox）,"◇不含公仔、模型、徽章等內容物，僅販售展示盒唷\n◇可根據您的特殊需求進行客製化與設計，有訂製需求的話可透過聊聊詢問\n◇有任何疑問都可以直接洽詢客服\n◇如果架上沒有你想買的款式也可以直接聯絡詢問"'
@@ -176,13 +149,7 @@ def export_csv_by_product_id(product_id):
             # print(f"品項名稱包含 '無需拼裝' 或 '透明無噴繪'，跳過：{option}")
             break
         
-        option = re.sub(r'W(\d+)cm', r'寬\1cm', option)
-        option = re.sub(r'H(\d+)cm', r'高\1cm', option)
-        option = re.sub(r'D(\d+)cm', r'長\1cm', option)
-
-        option = re.sub(r'W(\d+)', r'寬\1', option)
-        option = re.sub(r'H(\d+)', r'高\1', option)
-        option = re.sub(r'D(\d+)', r'長\1', option)
+        option = replaceOption(option)        
 
         option_string = f",10,,{option},,{price},,"
         row += option_string

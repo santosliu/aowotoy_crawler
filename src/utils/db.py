@@ -27,20 +27,17 @@ def set_product_pictured(product_id,ruten_id):
 
     return ''
 
-def get_products_without_publish():
+def getProductsWithoutPublish():
     mydb = None
     cursor = None
     try:
         mydb = connect_to_db()
         if mydb:
             cursor = mydb.cursor(dictionary=True)
-            sql = "SELECT * FROM aowotoy_products WHERE product_id = '655ae4cca6e0d9001dcf8564'"
+            sql = "SELECT * FROM aowotoy_products WHERE ruten_id is null LIMIT 2"
             cursor.execute(sql)
             product_data = cursor.fetchall()
-            if product_data:
-                print(f"從資料庫獲取原始產品資料 (列表): {product_data}")
-                # product_data 是列表，即使只有一條記錄，也需要取第一個元素
-                # 返回所有產品資料列表
+            if product_data:                
                 return product_data
             else:
                 print("資料庫中沒有待上傳的產品資料。")
@@ -61,7 +58,35 @@ def get_products_without_publish():
             mydb.close()
             print("資料庫連線已關閉。")
 
-def set_product_published(product_id,ruten_id):
+def setProductPublished(ruten_id,product_id):
 
-    return ''
-
+    mydb = None
+    cursor = None
+    try:
+        mydb = connect_to_db()
+        if mydb:
+            cursor = mydb.cursor(dictionary=True)
+            sql = "UPDATE aowotoy_products SET ruten_id = %s WHERE product_id = %s"
+            cursor.execute(sql, (ruten_id, product_id))
+            mydb.commit()
+            if cursor.rowcount > 0:
+                print(f"產品 {product_id} 的 ruten_id 已更新為 {ruten_id}。")
+                return True
+            else:
+                print(f"未找到產品 {product_id} 或 ruten_id 已是最新。")
+                return False
+        else:
+            print("無法連接到資料庫，無法獲取產品資料。")
+            return None
+    except mysql.connector.Error as err:
+        print(f"從資料庫獲取產品資料失敗: {err}")
+        return None
+    except Exception as e:
+        print(f"獲取產品資料時發生未知錯誤: {e}")
+        return None
+    finally:
+        if cursor:
+            cursor.close()
+        if mydb:
+            mydb.close()
+            print("資料庫連線已關閉。")
