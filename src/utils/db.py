@@ -52,3 +52,8 @@ def get_unpublish_product():
         if mydb:
             mydb.close()
             print("資料庫連線已關閉。")
+
+def set_product_published(product_id,ruten_id):
+
+    return ''
+
