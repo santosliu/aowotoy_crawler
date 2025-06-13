@@ -115,6 +115,7 @@ def replaceDetail(product_detail):
     product_detail = re.sub(r'H(\d+)', r'高\1', product_detail)
     product_detail = re.sub(r'D(\d+)', r'長\1', product_detail)
     product_detail = re.sub(r'鋼彈(\d+)%', r'高達\1%', product_detail)
+    product_detail = product_detail.replace('cm','公分')
 
     return product_detail
 
@@ -127,6 +128,8 @@ def replaceOption(option):
     option = re.sub(r'W(\d+)', r'寬\1', option)
     option = re.sub(r'H(\d+)', r'高\1', option)
     option = re.sub(r'D(\d+)', r'長\1', option)
+
+    option = option.replace('cm','公分')    
 
     return option
 

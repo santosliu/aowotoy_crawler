@@ -34,11 +34,29 @@ def getProductsWithoutPublish():
         mydb = connect_to_db()
         if mydb:
             cursor = mydb.cursor(dictionary=True)
-            sql = "SELECT * FROM aowotoy_products WHERE ruten_id is null LIMIT 2"
+
+            # product_id 655ae4cca6e0d9001dcf8564
+            sql = """
+            SELECT 
+                a.product_id AS product_id,
+                a.option_id AS option_id,
+                a.`name` AS product_name,
+                a.summary AS summary,
+                a.price AS price,
+                a.`option` AS option_text,
+                a.detail AS detail
+            FROM aowotoy_options AS a
+            INNER JOIN aowotoy_products AS b
+            ON a.product_id = b.product_id
+            -- WHERE b.ruten_id IS NULL 
+            WHERE b.product_id = '65395bf6a892ddd2483c46f6'
+            -- LIMIT 2
+            ;
+            """
             cursor.execute(sql)
-            product_data = cursor.fetchall()
-            if product_data:                
-                return product_data
+            product_options_data = cursor.fetchall() 
+            if product_options_data:                
+                return product_options_data
             else:
                 print("資料庫中沒有待上傳的產品資料。")
                 return None
@@ -58,15 +76,15 @@ def getProductsWithoutPublish():
             mydb.close()
             print("資料庫連線已關閉。")
 
-def setProductPublished(ruten_id,product_id):
-
+def setProductPublished(product_id,ruten_id):
+    
     mydb = None
     cursor = None
     try:
         mydb = connect_to_db()
         if mydb:
             cursor = mydb.cursor(dictionary=True)
-            sql = "UPDATE aowotoy_products SET ruten_id = %s WHERE product_id = %s"
+            sql = "UPDATE aowotoy_products SET ruten_id = %s WHERE product_id = %s;"
             cursor.execute(sql, (ruten_id, product_id))
             mydb.commit()
             if cursor.rowcount > 0:

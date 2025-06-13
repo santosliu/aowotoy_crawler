@@ -42,19 +42,20 @@ def upload_product(product_data: dict):
         'X-RT-Authorization': sign_bytes,
     }
 
+    # print(f'product_data:{product_data['custom_no']}')
+
     try:
         response = requests.post(url, json=product_data, headers=headers)
         response.raise_for_status() 
-        logging.info(f"Product upload successful: {response.text}")
         
-        # {"status":"success","data":{"item_id":"22524817576560","spec_info":[{"spec_id":"252400861778864","custom_no":"655ae4cc17325d001ea2620b","spec_name":"\u7121\u71c8\u539a\u5e95\u7248","item_name":""},{"spec_id":"252400861778875","custom_no":"655ae4cc17325d001ea2620c","spec_name":"\u9802\u5e95\u71c8\u7248","item_name":""}]},"error_code":null,"error_msg":null}        
         # 回寫至資料庫中備存
         ruten_id, product_id = getProductResponse(response.text)
-
+        
         try:
             data= json.loads(response.text)
             ruten_id = data.get("data", {}).get("item_id")
-            product_id = data.get("data", {}).get("custom_no")
+            product_id = product_data['custom_no']
+            
             setProductPublished(product_id,ruten_id)
             
         except json.JSONDecodeError as e:
@@ -150,52 +151,80 @@ if __name__ == '__main__':
     """
 
     products_to_upload = getProductsWithoutPublish()
-    print(products_to_upload)
-    store_class_id = '6529089'  # 預設為泡泡瑪特的 store_class_id
     
+    spec_info_list = [] 
+
     if products_to_upload:
         logging.info("準備上傳以下產品資料:")
 
         for item in products_to_upload:
-            product = dict(item) # 顯式轉換為字典
             
-            print(product)
-
+            product = item # 直接使用 item，因為它已經是字典或類似字典的對象
+            
             # 根據產品名稱處理行為
-            # 檢查 'name' 鍵是否存在且其值不為 None
-            product_name = product.get(b'name', b'').decode('utf-8') # 將鍵和預設值轉換為 bytes，並將結果解碼
+            # 確保從字典中取出的值是字串類型，並將鍵轉換為 bytes
+            product_name = str(product.get('product_name', ''))
+            
             if product_name and ("預購" in product_name or "預售" in product_name or "解放玩具" in product_name):
                 print(f"產品名稱包含 '預購' '預售' '解放玩具'，跳過匯出：{product_name}")
                 continue # 使用 continue 跳過當前迴圈的剩餘部分，繼續下一個產品
 
-            store_class_id = '6529089' if '泡泡瑪特' in product_name else '6529088' # 使用已解碼的 product_name
-            product_price = raisedPrice(product.get(b'price', 0)) # 將鍵轉換為 bytes
-            
-            spec_info_list = [] # 為每個產品重置 spec_info_list
+            store_class_id = '6529089' if '泡泡瑪特' in product_name else '6529088' # 轉換類別
+            product_price = raisedPrice(product.get('price')) 
 
-            # 這裡需要特別處理 product.get('option') 可能為 None 的情況
-            option_value = product.get(b'option') # 鍵改回 bytes
+            # 這裡需要特別處理 product.get('option_text') 可能為 None 的情況
+            option_value = product.get('option_text') 
+            
             if option_value is not None: # 檢查是否為 None
                 # 確保 option_value 是字串才進行 replace
                 if isinstance(option_value, bytes): # 如果是 bytes，則解碼
                     product_option = option_value.decode('utf-8')
                 else:
                     product_option = str(option_value) # 轉換為字串以防萬一
-
+                
+                # 只要是泡泡瑪特，就不上架 「無燈厚底版」 與 「底1燈版(USB)」
+                if store_class_id == '6529089' and ('無燈厚底版' in product_option or '底1燈版(USB)' in product_option):
+                    print(f'品項為泡泡瑪特，不上架「無燈厚底版」 與 「底1燈版(USB)」')
+                    print(f'品項：{product_option}')
+                    continue
+                
                 product_option = product_option.replace('只售展盒，不含展品+ ','')
-                print(f"當前 option: {product_option}")
+                
+                # 檢查 product_option 有沒有 + 號
+                if '+' in product_option:
+                    # 使用 + 號分隔 option
+                    options = product_option.split('+')
 
-                try:
-                    spec_info_list.append({
-                        'spec_name': replaceOption(product_option),
-                        'status': True,
-                        'price': product_price,
-                        'qty': 10,
-                        'custom_no': product.get(b'option_id', b'').decode('utf-8'), # 將鍵和預設值轉換為 bytes，並將結果解碼
-                    })
-                        
-                except json.JSONDecodeError as e:
-                    logging.error(f"解析失敗: {e}")
+                    # 我只要第一和第二個 option，分別命名為 spec_name 和 item_name
+                    spec_name = options[0].strip()
+                    item_name = options[1].strip()
+
+                    try:
+                        spec_info_list.append({
+                            'spec_name': replaceOption(spec_name),
+                            'item_name': replaceOption(item_name), 
+                            'status': True,
+                            'price': product_price,
+                            'qty': 10,
+                            'custom_no': str(product.get('option_id', '')), # 確保 custom_no 是字串
+                        })
+                            
+                    except json.JSONDecodeError as e:
+                        logging.error(f"解析失敗: {e}")
+
+
+                else:
+                    try:
+                        spec_info_list.append({
+                            'spec_name': replaceOption(product_option),
+                            'status': True,
+                            'price': product_price,
+                            'qty': 10,
+                            'custom_no': str(product.get('option_id', '')), # 確保 custom_no 是字串
+                        })
+                            
+                    except json.JSONDecodeError as e:
+                        logging.error(f"解析失敗: {e}")
 
         # 構建上傳的產品資料字典
         product_data = {
@@ -204,22 +233,25 @@ if __name__ == '__main__':
             'store_class_id': store_class_id,
             'condition': 1, 
             'stock_status': '21DAY', 
-            'description': replaceDetail(product.get(b'detail', b'').decode('utf-8')), # 將鍵和預設值轉換為 bytes，並將結果解碼
+            'description': replaceDetail(str(product.get('detail', ''))), # 確保 detail 是字串
             'video_link': '',
             'location_type': 1, # 預設為 1 (台灣)
             'location': '03', # 預設為 03 (新北市)
             'shipping_setting': 1, 
             'has_spec': bool(spec_info_list), # 如果 spec_info_list 不為空，則為 True
-            'price': product.get(b'price', 0), # 將鍵轉換為 bytes
+            'price': product_price, 
             'qty': 10,
-            'custom_no': product.get(b'product_id', b'').decode('utf-8'), # 將鍵和預設值轉換為 bytes，並將結果解碼
+            'custom_no': str(product.get('product_id', '')), # 確保 custom_no 是字串
         }
             
         # 如果有規格，則添加 spec_info
         if spec_info_list:
             product_data['spec_info'] = spec_info_list
-                    
-        logging.info(f"轉換後的產品資料: {json.dumps(product_data, ensure_ascii=False, indent=2)}")
-        # upload_product(product_data) # 在迴圈內部呼叫 upload_product
+
+
+        # logging.info(f"轉換後的產品資料: {json.dumps(product_data, ensure_ascii=False, indent=2)}")
+        
+        upload_product(product_data) 
+
     else:
         logging.info("沒有產品資料可供上傳。")

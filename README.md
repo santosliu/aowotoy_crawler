@@ -24,6 +24,8 @@
 
 先篩選這五種的不上架就可以了
 
+只要是泡泡瑪特，就不上架 「無燈厚底版」 與 「底1燈版(USB)」
+
 # 待處理
 
 中文字網址 https://www.aowotoys.com/products/aowobox-%E9%AB%98%E9%80%8F%E6%89%8B%E8%BE%A6%E4%B8%BB%E9%A1%8C%E5%B1%95%E7%A4%BA%E7%9B%92-%E9%81%A9%E7%94%A8%E6%96%BC-%E6%93%8E%E8%92%BC%E5%B7%A5%E4%BD%9C%E5%AE%A4-%E6%B4%9B%E5%A4%A9%E4%BE%9D-%E6%A2%A8%E8%8A%B1%E9%9B%AAver%E6%89%8B%E8%BE%A6?locale=zh-hant
