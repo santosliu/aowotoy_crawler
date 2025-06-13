@@ -78,77 +78,6 @@ def upload_product(product_data: dict):
                 logging.error(f"Response Text (raw): {e.response.content}")
 
 if __name__ == '__main__':
-    # 示例產品資料
-    # product_data = {
-    #     'name': '阿庫力測試泡泡瑪特',
-    #     'class_id': '00050008',
-    #     'store_class_id': '6529089', # 泡泡瑪特的全丟到泡泡瑪特(6529089)，其他可以全丟到公仔模型(6529088)
-    #     'condition': 1,
-    #     'stock_status': '21DAY',
-    #     'description': '此為測試品項，之後請刪除',
-    #     'video_link': '',
-    #     'location_type': 1,
-    #     'location': '03',
-    #     'shipping_setting': 1,
-    #     'has_spec': False, 
-    #     'price': 99999999,
-    #     'qty': 10,
-    #     'custom_no': '6594da97bbd776001127a5',
-    #     'has_spec': True,
-    #     'spec_info':[
-    #         {
-    #             'spec_name': '互卡拼裝',
-    #             'item_name': '背底圖案噴繪',
-    #             'status': True,
-    #             'price': 99999991,
-    #             'qty': 10,
-    #             'custom_no': '6594da97b9332a00126b08',
-    #         },
-    #         {
-    #             'spec_name': '互卡拼裝',
-    #             'item_name': '簡配透明盒身',
-    #             'status': True,
-    #             'price': 99999992,
-    #             'qty': 10,
-    #             'custom_no': '6594da97b9332a00126b09',
-    #         },
-    #         {
-    #             'spec_name': '無需拼裝',
-    #             'item_name': '背底圖案噴繪',
-    #             'status': True,
-    #             'price': 99999993,
-    #             'qty': 10,
-    #             'custom_no': '6594da97b9332a00126b0a',
-    #         },
-    #         {
-    #             'spec_name': '無需拼裝',
-    #             'item_name': '簡配透明盒身',
-    #             'status': True,
-    #             'price': 99999993,
-    #             'qty': 10,
-    #             'custom_no': '6594da97b9332a00126b0b',
-    #         }
-    #     ]
-    # }
-
-    # upload_product(product_data)
-
-    ##### 以上為測試用 #####
-
-
-    """
-
-    以下不用上架
-
-    選項有 無需拼裝一體式
-    選項有 無需拼裝
-    選項有 透明無噴繪
-    標題 有「預售」
-    標題 有「解放玩具」
-
-    找到之後回寫錯誤狀態
-
-    """
 
     products_to_upload = getProductsWithoutPublish()
     
@@ -182,6 +111,10 @@ if __name__ == '__main__':
                 else:
                     product_option = str(option_value) # 轉換為字串以防萬一
                 
+                if ('無需拼裝' in product_option or '透明無噴繪' in product_option):
+                    print(f'「無需拼裝」 與 「透明無噴繪」不上架')
+                    continue
+
                 # 只要是泡泡瑪特，就不上架 「無燈厚底版」 與 「底1燈版(USB)」
                 if store_class_id == '6529089' and ('無燈厚底版' in product_option or '底1燈版(USB)' in product_option):
                     print(f'品項為泡泡瑪特，不上架「無燈厚底版」 與 「底1燈版(USB)」')
@@ -248,8 +181,7 @@ if __name__ == '__main__':
         if spec_info_list:
             product_data['spec_info'] = spec_info_list
 
-
-        # logging.info(f"轉換後的產品資料: {json.dumps(product_data, ensure_ascii=False, indent=2)}")
+        logging.info(f"轉換後的產品資料: {json.dumps(product_data, ensure_ascii=False, indent=2)}")
         
         upload_product(product_data) 
 

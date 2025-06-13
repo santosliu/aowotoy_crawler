@@ -28,6 +28,12 @@ def set_product_pictured(product_id,ruten_id):
     return ''
 
 def getProductsWithoutPublish():
+    """
+
+    調整 SQL，每次只取得一個商品
+
+    """
+    
     mydb = None
     cursor = None
     try:
@@ -35,7 +41,6 @@ def getProductsWithoutPublish():
         if mydb:
             cursor = mydb.cursor(dictionary=True)
 
-            # product_id 655ae4cca6e0d9001dcf8564
             sql = """
             SELECT 
                 a.product_id AS product_id,
@@ -47,10 +52,13 @@ def getProductsWithoutPublish():
                 a.detail AS detail
             FROM aowotoy_options AS a
             INNER JOIN aowotoy_products AS b
-            ON a.product_id = b.product_id
-            -- WHERE b.ruten_id IS NULL 
-            WHERE b.product_id = '65395bf6a892ddd2483c46f6'
-            -- LIMIT 2
+                ON a.product_id = b.product_id
+            WHERE b.ruten_id IS NULL
+                AND a.product_id = (
+                    SELECT MIN(product_id) 
+                    FROM aowotoy_products 
+                    WHERE ruten_id IS NULL
+                );
             ;
             """
             cursor.execute(sql)
