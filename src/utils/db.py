@@ -19,13 +19,85 @@ def connect_to_db():
         print(f"資料庫連線失敗：{err}")
         return None
 
-def get_products_without_picture():
+def getProductsWithoutPicture():
 
-    return ''
+    """
 
-def set_product_pictured(product_id,ruten_id):
+    調整 SQL，每次只取得一個商品
 
-    return ''
+    """
+    
+    mydb = None
+    cursor = None
+    try:
+        mydb = connect_to_db()
+        if mydb:
+            cursor = mydb.cursor(dictionary=True)
+
+            sql = """
+            SELECT * FROM aowotoy_products
+            WHERE ruten_id IS NOT NULL 
+            AND image_counts IS NULL
+            LIMIT 1
+            """
+            cursor.execute(sql)
+            product_options_data = cursor.fetchall() 
+            if product_options_data:
+                ruten_id = product_options_data[0]['ruten_id']
+                product_id = product_options_data[0]['product_id']
+
+                return ruten_id, product_id
+            else:
+                print("資料庫中沒有待上傳的產品資料。")
+                return None, None
+        else:
+            print("無法連接到資料庫，無法獲取產品資料。")
+            return None, None
+    except mysql.connector.Error as err:
+        print(f"從資料庫獲取產品資料失敗: {err}")
+        return None, None
+    except Exception as e:
+        print(f"獲取產品資料時發生未知錯誤: {e}")
+        return None, None
+    finally:
+        if cursor:
+            cursor.close()
+        if mydb:
+            mydb.close()
+            print("資料庫連線已關閉。")
+
+def setProductWithPictureCount(product_id,image_counts):
+
+    mydb = None
+    cursor = None
+    try:
+        mydb = connect_to_db()
+        if mydb:
+            cursor = mydb.cursor(dictionary=True)
+            sql = "UPDATE aowotoy_products SET image_counts = %s WHERE product_id = %s;"
+            cursor.execute(sql, (image_counts, product_id))
+            mydb.commit()
+            if cursor.rowcount > 0:
+                print(f"產品 {product_id} 的圖片數量已更新為 {image_counts}。")
+                return True
+            else:
+                print(f"未找到產品 {product_id} 或所有商品皆上圖完畢。")
+                return False
+        else:
+            print("無法連接到資料庫，無法獲取產品資料。")
+            return None
+    except mysql.connector.Error as err:
+        print(f"從資料庫獲取產品資料失敗: {err}")
+        return None
+    except Exception as e:
+        print(f"獲取產品資料時發生未知錯誤: {e}")
+        return None
+    finally:
+        if cursor:
+            cursor.close()
+        if mydb:
+            mydb.close()
+            print("資料庫連線已關閉。")
 
 def getProductsWithoutPublish():
     """

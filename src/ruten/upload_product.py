@@ -79,6 +79,10 @@ def upload_product(product_data: dict):
 
 if __name__ == '__main__':
 
+    """
+    之後加個迴圈，一次上 10 筆吧？
+    """
+
     products_to_upload = getProductsWithoutPublish()
     
     spec_info_list = [] 

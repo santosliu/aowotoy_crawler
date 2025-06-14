@@ -8,14 +8,14 @@
 """
 
 import os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-
 import sys
 import time
 import requests
 import logging
+import json # 新增 json 模組
 from dotenv import load_dotenv
+from src.utils.db import getProductsWithoutPicture, setProductWithPictureCount
+
 
 # 將專案根目錄添加到 Python 模組搜索路徑
 # 這樣可以確保在任何位置執行腳本時，都能正確導入 src 模組
@@ -25,9 +25,12 @@ sys.path.insert(0, project_root)
 
 from src.utils.common import genSign_compact 
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-    logging.info('腳本開始執行。')
+    
+    logging.info('開始進行 upload_picture。')
 
     load_dotenv() 
 
@@ -39,17 +42,22 @@ if __name__ == '__main__':
 
 
     # 取得已經上架但是還沒上圖片的項目
-    # 回傳 ruten_id , product_id
-
-
+    ruten_id, product_id = getProductsWithoutPicture()
+    
     payload = {
-        'item_id': '22523758244600'
+        'item_id': ruten_id
     }
 
-    files=[
-    ('images[]',('test1.png',open('doc/pic/test1.png','rb'),'image/png')),
-    ('images[]', ('test2.jpg', open('doc/pic/test2.jpg', 'rb'), 'image/jpeg')),
-    ]
+    # 取得 product_id 底下的圖片資料
+    files = []
+    
+    products_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'products', str(product_id))
+    image_files = [f for f in os.listdir(products_dir) if os.path.isfile(os.path.join(products_dir, f))]
+
+    for image_file in image_files:
+        file_path = os.path.join(products_dir, image_file)        
+        mime_type = 'image/png' if image_file.lower().endswith('.png') else 'image/jpeg'
+        files.append(('images[]', (image_file, open(file_path, 'rb'), mime_type)))
 
     sign_bytes = genSign_compact(url, payload, timestamp)
 
@@ -62,6 +70,16 @@ if __name__ == '__main__':
 
     logging.info(f'正在向 {url} 發送請求...')
     response = requests.request("POST", url, headers=headers, data=payload, files=files)
-
     logging.info(f'收到回應: {response.text}')
+
+    # 解析 JSON 字串
+    response_data = json.loads(response.text)
+    
+    # 取得 success_images 的值
+    success_images_count = response_data['data']['success_images']
+    logging.info(f'成功上傳圖片數量: {success_images_count}')
+
+    # 回寫資訊到 db
+    setProductWithPictureCount(product_id, success_images_count)
+    
     logging.info('腳本執行結束。')
