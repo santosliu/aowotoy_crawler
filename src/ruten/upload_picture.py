@@ -44,6 +44,9 @@ if __name__ == '__main__':
     # 取得已經上架但是還沒上圖片的項目
     ruten_id, product_id = getProductsWithoutPicture()
     
+    # 如果 ruten_id 不為 null
+    
+
     payload = {
         'item_id': ruten_id
     }

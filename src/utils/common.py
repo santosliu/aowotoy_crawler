@@ -116,6 +116,7 @@ def replaceDetail(product_detail):
     product_detail = re.sub(r'D(\d+)', r'長\1', product_detail)
     product_detail = re.sub(r'鋼彈(\d+)%', r'高達\1%', product_detail)
     product_detail = product_detail.replace('cm','公分')
+    product_detail = product_detail.replace('\n','<br/>')
 
     return product_detail
 

@@ -64,7 +64,6 @@ def getProductsWithoutPicture():
             cursor.close()
         if mydb:
             mydb.close()
-            print("資料庫連線已關閉。")
 
 def setProductWithPictureCount(product_id,image_counts):
 

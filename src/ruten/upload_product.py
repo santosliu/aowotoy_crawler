@@ -87,8 +87,7 @@ if __name__ == '__main__':
     
     spec_info_list = [] 
 
-    if products_to_upload:
-        logging.info("準備上傳以下產品資料:")
+    if products_to_upload:        
 
         for item in products_to_upload:
             
@@ -185,7 +184,7 @@ if __name__ == '__main__':
         if spec_info_list:
             product_data['spec_info'] = spec_info_list
 
-        logging.info(f"轉換後的產品資料: {json.dumps(product_data, ensure_ascii=False, indent=2)}")
+        # logging.info(f"轉換後的產品資料: {json.dumps(product_data, ensure_ascii=False, indent=2)}")
         
         upload_product(product_data) 
 
