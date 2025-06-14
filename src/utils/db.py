@@ -135,18 +135,18 @@ def getProductsWithoutPublish():
 
             # 測試用程式碼
             
-            # sql = """
-            # SELECT  
-            #     a.product_id AS product_id,
-            #     a.option_id AS option_id,
-            #     a.`name` AS product_name,
-            #     a.summary AS summary,
-            #     a.price AS price,
-            #     a.`option` AS option_text,
-            #     a.detail AS detail
-            # FROM aowotoy_options as a
-            # WHERE product_id = '659e2f7685b0500015971e15'
-            # """
+            sql = """
+            SELECT  
+                a.product_id AS product_id,
+                a.option_id AS option_id,
+                a.`name` AS product_name,
+                a.summary AS summary,
+                a.price AS price,
+                a.`option` AS option_text,
+                a.detail AS detail
+            FROM aowotoy_options as a
+            WHERE product_id = '6562fbc103b565000e2bbc83'
+            """
 
             cursor.execute(sql)
             product_options_data = cursor.fetchall() 

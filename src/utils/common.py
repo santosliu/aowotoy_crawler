@@ -94,6 +94,14 @@ def replaceTitle(product_name):
 
 def replaceDetail(product_detail):
 
+
+    product_detail = product_detail.replace('展示盒使用高達95%透光度的高透亮亞克力物料製造。主題高清噴繪設計背景，配上LED燈板，提升展品氛圍，同時免受塵封困擾', '')
+    product_detail = re.sub(r'(.*+)同時免受塵封困擾', r'', product_detail)
+    
+    product_detail = product_detail.replace('brand:AOWOBOX', '')
+    product_detail = product_detail.replace('brand:', '')
+    product_detail = product_detail.replace('AOWOBOX', '')
+
     product_detail = product_detail.replace(' ', '')
     product_detail = product_detail.replace('高達', '鋼彈')
     product_detail = product_detail.replace('手辦', '專用')
@@ -102,6 +110,10 @@ def replaceDetail(product_detail):
     product_detail = product_detail.replace('良笑社', '')
     product_detail = product_detail.replace('高透主題展示盒', '')
     product_detail = product_detail.replace('高透射燈主題展示盒', '')   
+    product_detail = product_detail.replace('material', '材質')
+    product_detail = product_detail.replace('powersupply', '電源')
+    product_detail = product_detail.replace('款式選擇', '規格細節')
+    product_detail = product_detail.replace(':', '：')
 
     # product_detail 使用 re 取代 
     # from size:W25 cm D20cm H30cm
@@ -117,8 +129,10 @@ def replaceDetail(product_detail):
     product_detail = re.sub(r'鋼彈(\d+)%', r'高達\1%', product_detail)
     product_detail = product_detail.replace('cm','公分')
     product_detail = product_detail.replace('\t','')
-    product_detail = product_detail.replace('\n\n','\n')
     product_detail = product_detail.replace('\n','<br/>')
+    
+    product_detail = re.sub(r'(<br\s*/?>\s*){3,}', '<br/><br/>', product_detail, flags=re.IGNORECASE)
+    product_detail = re.sub(r'.*同時免受塵封困擾<br/>', '', product_detail)
 
     return product_detail
 
