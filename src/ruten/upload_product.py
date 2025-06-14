@@ -184,7 +184,7 @@ if __name__ == '__main__':
         if spec_info_list:
             product_data['spec_info'] = spec_info_list
 
-        # logging.info(f"轉換後的產品資料: {json.dumps(product_data, ensure_ascii=False, indent=2)}")
+        logging.info(f"轉換後的產品資料: {json.dumps(product_data, ensure_ascii=False, indent=2)}")
         
         upload_product(product_data) 
 

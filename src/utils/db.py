@@ -13,7 +13,7 @@ def connect_to_db():
             password=os.getenv("DB_PASSWORD"),
             database=os.getenv("DB_NAME")
         )
-        print("資料庫連線成功。")
+        
         return mydb
     except mysql.connector.Error as err:
         print(f"資料庫連線失敗：{err}")
@@ -132,6 +132,22 @@ def getProductsWithoutPublish():
                 );
             ;
             """
+
+            # 測試用程式碼
+            
+            # sql = """
+            # SELECT  
+            #     a.product_id AS product_id,
+            #     a.option_id AS option_id,
+            #     a.`name` AS product_name,
+            #     a.summary AS summary,
+            #     a.price AS price,
+            #     a.`option` AS option_text,
+            #     a.detail AS detail
+            # FROM aowotoy_options as a
+            # WHERE product_id = '659e2f7685b0500015971e15'
+            # """
+
             cursor.execute(sql)
             product_options_data = cursor.fetchall() 
             if product_options_data:                
@@ -153,7 +169,6 @@ def getProductsWithoutPublish():
             cursor.close()
         if mydb:
             mydb.close()
-            print("資料庫連線已關閉。")
 
 def setProductPublished(product_id,ruten_id):
     
@@ -186,4 +201,3 @@ def setProductPublished(product_id,ruten_id):
             cursor.close()
         if mydb:
             mydb.close()
-            print("資料庫連線已關閉。")
