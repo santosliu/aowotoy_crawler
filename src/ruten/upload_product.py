@@ -77,12 +77,7 @@ def upload_product(product_data: dict):
             except (UnicodeDecodeError, json.JSONDecodeError):
                 logging.error(f"Response Text (raw): {e.response.content}")
 
-if __name__ == '__main__':
-
-    """
-    之後加個迴圈，一次上 10 筆吧？
-    """
-
+def process_upload():
     products_to_upload = getProductsWithoutPublish()
     
     spec_info_list = [] 
@@ -184,9 +179,22 @@ if __name__ == '__main__':
         if spec_info_list:
             product_data['spec_info'] = spec_info_list
 
-        logging.info(f"轉換後的產品資料: {json.dumps(product_data, ensure_ascii=False, indent=2)}")
+        # logging.info(f"轉換後的產品資料: {json.dumps(product_data, ensure_ascii=False, indent=2)}")
         
         upload_product(product_data) 
 
     else:
         logging.info("沒有產品資料可供上傳。")
+
+if __name__ == '__main__':
+
+    """
+    之後加個迴圈，一次上 10 筆吧？
+    """
+    count = 0
+    for i in range(10):
+        process_upload()
+        count = count+1
+        logging.info(f'已上架 {count} 件商品')        
+
+    

@@ -10,33 +10,15 @@
   - jolly
 - 輸出到指定網站
 
-# 不上架商品
-
-- 先上所有商品
-- 取得本賣家所有商品
-- 依照商品上圖片
-
-- 選項有 無需拼裝一體式
-- 選項有 無需拼裝
-- 選項有 透明無噴繪
-- 標題 有「預售」
-- 標題 有「解放玩具」
-
-先篩選這五種的不上架就可以了
-
-只要是泡泡瑪特，就不上架 「無燈厚底版」 與 「底1燈版(USB)」
-
 # 待處理
-
-
 
 中文字網址 https://www.aowotoys.com/products/aowobox-%E9%AB%98%E9%80%8F%E6%89%8B%E8%BE%A6%E4%B8%BB%E9%A1%8C%E5%B1%95%E7%A4%BA%E7%9B%92-%E9%81%A9%E7%94%A8%E6%96%BC-%E6%93%8E%E8%92%BC%E5%B7%A5%E4%BD%9C%E5%AE%A4-%E6%B4%9B%E5%A4%A9%E4%BE%9D-%E6%A2%A8%E8%8A%B1%E9%9B%AAver%E6%89%8B%E8%BE%A6?locale=zh-hant
 
 No data fetched for product_id 66c4420fd2f6d7001f6b1c9b
 
-定期檢查新商品
+定期檢查新商品 (抓圖後執行 resize.py 處理圖片大小)
 
-定期檢查預售商品修改狀況
+定期檢查舊商品商品修改狀況 (圖片不用重抓)
 
 定期 rclone sync
 D:\Code\aowotoy_crawler>D:\Dropbox\01_工具程式\rclone-v1.69.3-windows-amd64\rclone sync products r2:toy --progress -v

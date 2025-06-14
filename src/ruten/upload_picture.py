@@ -27,9 +27,7 @@ from src.utils.common import genSign_compact
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
-if __name__ == '__main__':
-    
+def process_upload():
     load_dotenv() 
 
     url = 'https://partner.ruten.com.tw/api/v1/product/item/image'
@@ -56,7 +54,7 @@ if __name__ == '__main__':
         mime_type = 'image/png' if image_file.lower().endswith('.png') else 'image/jpeg'
         files.append(('images[]', (image_file, open(file_path, 'rb'), mime_type)))
 
-    print(f'files: {files}')
+    # print(f'files: {files}')
 
     sign_bytes = genSign_compact(url, payload, timestamp)
 
@@ -75,5 +73,14 @@ if __name__ == '__main__':
     
     # 回寫資訊到 db
     setProductWithPictureCount(product_id, success_images_count)
+
+if __name__ == '__main__':
+
+    count = 0
+    for i in range(10):
+        process_upload()
+        count = count+1
+        logging.info(f'已替 {count} 件商品上圖')
+    
     
     
