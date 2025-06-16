@@ -120,6 +120,8 @@ def process_upload():
                     continue
                 
                 product_option = product_option.replace('只售展盒，不含展品+ ','')
+                product_option = product_option.replace('only for Display Box, NOT include the exhibit+ ','')
+                product_option = product_option.replace('(只有展盒 不含模型)','')
                 
                 # 檢查 product_option 有沒有 + 號
                 if '+' in product_option:
@@ -179,7 +181,7 @@ def process_upload():
         if spec_info_list:
             product_data['spec_info'] = spec_info_list
 
-        # logging.info(f"轉換後的產品資料: {json.dumps(product_data, ensure_ascii=False, indent=2)}")
+        logging.info(f"轉換後的產品資料: {json.dumps(product_data, ensure_ascii=False, indent=2)}")
         
         upload_product(product_data) 
 

@@ -88,6 +88,7 @@ def replaceTitle(product_name):
     product_name = product_name.replace('良笑社', '')
     product_name = product_name.replace('高透主題展示盒', '主題展示盒')
     product_name = product_name.replace('高透射燈主題展示盒', '主題展示盒')    
+    product_name = product_name.replace('\\u0026', '')
 
     return product_name
 

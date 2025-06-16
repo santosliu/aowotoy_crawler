@@ -38,6 +38,7 @@ def getProductsWithoutPicture():
             SELECT * FROM aowotoy_products
             WHERE ruten_id IS NOT NULL 
             AND image_counts IS NULL
+            AND ruten_id != '100'
             LIMIT 1
             """
             cursor.execute(sql)
@@ -130,7 +131,6 @@ def getProductsWithoutPublish():
                     FROM aowotoy_products 
                     WHERE ruten_id IS NULL
                 );
-            ;
             """
 
             # 測試用程式碼
