@@ -135,6 +135,7 @@ def getProductsWithoutPublish():
 
             # 測試用程式碼
             
+            # 先上泡泡瑪特用
             # sql = """
             # SELECT  
             #     a.product_id AS product_id,
@@ -145,7 +146,26 @@ def getProductsWithoutPublish():
             #     a.`option` AS option_text,
             #     a.detail AS detail
             # FROM aowotoy_options as a
-            # WHERE product_id = '6562fbc103b565000e2bbc83'
+            # WHERE product_id = (
+			# 	SELECT product_id 
+            #     FROM aowotoy_products 
+            #     WHERE url LIKE '%mart%' 
+            #     AND ruten_id IS NULL                 
+            #     LIMIT 1
+			# 	)
+            # """
+
+            # sql = """
+            # SELECT  
+            #     a.product_id AS product_id,
+            #     a.option_id AS option_id,
+            #     a.`name` AS product_name,
+            #     a.summary AS summary,
+            #     a.price AS price,
+            #     a.`option` AS option_text,
+            #     a.detail AS detail
+            # FROM aowotoy_options as a
+            # WHERE product_id = '65b78bcb743dc700173b9745'
             # """
 
             cursor.execute(sql)
@@ -195,6 +215,40 @@ def setProductPublished(product_id,ruten_id):
         return None
     except Exception as e:
         print(f"獲取產品資料時發生未知錯誤: {e}")
+        return None
+    finally:
+        if cursor:
+            cursor.close()
+        if mydb:
+            mydb.close()
+
+def getProductOptionsByProductId(product_id):
+    """根據 product_id 取得產品選項資料"""
+    mydb = None
+    cursor = None
+    try:
+        mydb = connect_to_db()
+        if mydb:
+            cursor = mydb.cursor(dictionary=True)
+            sql = """
+            SELECT * FROM aowotoy_options
+            WHERE product_id = %s
+            """
+            cursor.execute(sql, (product_id,))
+            product_options_data = cursor.fetchall()
+            if product_options_data:
+                return product_options_data
+            else:
+                print(f"未找到產品 {product_id} 的選項資料。")
+                return None
+        else:
+            print("無法連接到資料庫，無法獲取產品選項資料。")
+            return None
+    except mysql.connector.Error as err:
+        print(f"從資料庫獲取產品選項資料失敗: {err}")
+        return None
+    except Exception as e:
+        print(f"獲取產品選項資料時發生未知錯誤: {e}")
         return None
     finally:
         if cursor:

@@ -194,7 +194,7 @@ if __name__ == '__main__':
     之後加個迴圈，一次上 10 筆吧？
     """
     count = 0
-    for i in range(10):
+    for i in range(20):
         process_upload()
         count = count+1
         logging.info(f'已上架 {count} 件商品')        

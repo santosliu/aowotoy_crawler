@@ -95,8 +95,6 @@ def replaceTitle(product_name):
 
 def replaceDetail(product_detail):
 
-
-    
     product_detail = product_detail.replace('展示盒使用高達95%透光度的高透亮亞克力物料製造。主題高清噴繪設計背景，配上LED燈板，提升展品氛圍，同時免受塵封困擾', '')
     product_detail = re.sub(r'(.*+)同時免受塵封困擾', r'', product_detail)
     
