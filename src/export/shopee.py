@@ -13,8 +13,19 @@ load_dotenv()
 # CSV file name
 csv_file = 'shopee_goods.csv'
 
+def get_image_count(product_id):
+    """抓取 /products/{product_id} 目錄底下的檔案數量。"""
+    image_count = 0
+    product_images_dir = os.path.join('products', str(product_id))
+    if os.path.exists(product_images_dir) and os.path.isdir(product_images_dir):
+        for item in os.listdir(product_images_dir):
+            if os.path.isfile(os.path.join(product_images_dir, item)):
+                image_count += 1
+    else:
+        print(f"目錄不存在或不是一個目錄: {product_images_dir}")
+    return image_count
+
 def delete_csv():
-    """Traverse directories and delete all CSV files."""
     for root, _, files in os.walk('.'):
         for file in files:
             if file.endswith('.csv'):
@@ -58,11 +69,20 @@ def export_all_csv(output_filename):
             # 輸出資料至 CSV
             for i, row in enumerate(rows):
                 
-                product_id = row[0]
-                product_options_data = getProductOptionsByProductId(product_id)
-                print(product_options_data)
+                spec_name = ''
+                item_name = ''
+                product_name = ''
+                product_detail = ''
 
-                # for prodcut_options_data
+                product_id = row[0]
+
+                product_options_data = getProductOptionsByProductId(product_id)
+                
+                if product_options_data is None:
+                    print(f"未找到產品 {product_id} 的選項資料。")
+                    continue
+
+                option_serial = 0
                 for option in product_options_data:
 
                     product_name = option['name']
@@ -70,10 +90,10 @@ def export_all_csv(output_filename):
                     if product_name and ("解放玩具" in product_name):
                         print(f"產品名稱包含 '解放玩具'，跳過匯出：{product_name}")
                         continue 
-                    
-                    # 2025/06/24 處理到 option
+                                        
                     option_value = option['option'] 
-            
+                    option_id = option['option_id']
+                    
                     if option_value is not None: # 檢查是否為 None
                         # 確保 option_value 是字串才進行 replace
                         if isinstance(option_value, bytes): # 如果是 bytes，則解碼
@@ -86,7 +106,7 @@ def export_all_csv(output_filename):
                             continue
 
                         # 只要是泡泡瑪特，就不上架 「無燈厚底版」 與 「底1燈版(USB)」
-                        if store_class_id == '6529089' and ('無燈厚底版' in product_option or '底1燈版(USB)' in product_option):
+                        if product_name and ("泡泡馬特" in product_name) and ('無燈厚底版' in product_option or '底1燈版(USB)' in product_option):
                             print(f'品項為泡泡瑪特，不上架「無燈厚底版」 與 「底1燈版(USB)」')
                             print(f'品項：{product_option}')
                             continue
@@ -95,6 +115,7 @@ def export_all_csv(output_filename):
                         product_option = product_option.replace('only for Display Box, NOT include the exhibit+ ','')
                         product_option = product_option.replace('(只有展盒 不含模型)','')
                         
+                        option_serial = option_serial + 1
                         # 檢查 product_option 有沒有 + 號
                         if '+' in product_option:
                             # 使用 + 號分隔 option
@@ -103,50 +124,71 @@ def export_all_csv(output_filename):
                             # 我只要第一和第二個 option，分別命名為 spec_name 和 item_name
                             spec_name = options[0].strip()
                             item_name = options[1].strip()
+                            
+                            transformed_row = [
+                                '101385',
+                                replaceTitle(product_name),
+                                replaceDetail(product_detail),
+                                '1',
+                                str(product_id),
+                                option_serial, # 同商品規格流水號(F)
+                                item_name,
+                                spec_name,
+                                '', # 首圖?(I)
+                                '',
+                                '',
+                                raisedPrice(option['price']) , # 價格(L)
+                                '10', # 庫存 (M)                        
+                                option_id, # 商品選項貨號 (N)
+                                '',
+                                '',
+                                '00',
+                            ]
 
-                            try:
-                                spec_info_list.append({
-                                    'spec_name': replaceOption(spec_name),
-                                    'item_name': replaceOption(item_name), 
-                                    'status': True,
-                                    'price': product_price,
-                                    'qty': 10,
-                                    'custom_no': str(product.get('option_id', '')), # 確保 custom_no 是字串
-                                })
-                                    
-                            except json.JSONDecodeError as e:
-                                logging.error(f"解析失敗: {e}")
+                        else:
+                            
+                            transformed_row = [
+                                '101385',
+                                replaceTitle(product_name),
+                                replaceDetail(product_detail),
+                                '1',
+                                str(product_id),
+                                option_serial, # 同商品規格流水號(F)
+                                product_option,
+                                '',
+                                '', # 首圖?(I)
+                                '',
+                                '',
+                                raisedPrice(option['price']) , # 價格(L)
+                                '10', # 庫存 (M)                        
+                                option_id, # 商品選項貨號 (N)
+                                '',
+                                '',
+                                '00',                                
+                            ]
 
-                    product_price = raisedPrice(option['price']) 
-                    
-                    
-                    detail = option['detail']
-                    option_id = option['option_id']
+                        image_count = get_image_count(product_id)
+                        
+                        for i in range(1, 7):
+                            if (i <= image_count):
+                                transformed_row.append(f"https://images.gameqb.net/{product_id}/{product_id}_{i:04d}.jpg")
+                            else:
+                                transformed_row.append("")
 
-                    product_option = {}
+                        transformed_row.append("")
+                        transformed_row.append("")
+                        transformed_row.append("")
+                        transformed_row.append("")
+                        transformed_row.append("")
+                        transformed_row.append("")
+                        transformed_row.append("")
+                        transformed_row.append("關閉")
+                        transformed_row.append("關閉")
+                        transformed_row.append("開啟")
+                        transformed_row.append("20")
 
-
-                transformed_row = [
-                    '101385',
-                    replaceTitle(name),
-                    replaceDetail(detail),
-                    '1',
-                    str(product_id),
-                    '1', # F
-                    option,
-                    str(final_price),
-                    '10',
-                    '6438417',
-                    f'專為 {name} 設計的壓克力公仔模型展示盒，附有噴繪背景與底板設計。\n\n商品材質：壓克力\n\n商品規格：{option}\n\n如有其他商品疑問，例如燈款、電源等，歡迎小窗詢問。',
-                    '',
-                    f'{product_id}_1.jpg',
-                    f'{product_id}_2.jpg'
-                ]
-
-                # Write data to the single CSV file
-                writer.writerow(transformed_row)
-
-                print(f"Data for product {product_id} exported to {all_csv_file}")
+                        writer.writerow(transformed_row)
+                        print(f"Data for product {product_id} exported to {all_csv_file}")
 
         print(f"All product data exported to {all_csv_file}")
 
