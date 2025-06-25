@@ -129,12 +129,56 @@ def replaceDetail(product_detail):
     product_detail = re.sub(r'鋼彈(\d+)%', r'高達\1%', product_detail)
     product_detail = product_detail.replace('cm','公分')
     product_detail = product_detail.replace('\t','')
+    
+    product_detail = re.sub(r'(<br\s*/?>\s*){3,}', '\n\n', product_detail, flags=re.IGNORECASE)
+    product_detail = re.sub(r'.*同時免受塵封困擾\n', '', product_detail)
+
+    final_detail = """📕請先閱讀注意事項再下單哦\n商品寄送需要等待清關，預計 20 天內會寄到您手上\n請一定要確認填寫資料的正確性，不然重寄會需要等待哦\n因為超商取貨有尺寸限制，所以只能透過宅配運送\n圖片是參考用的示意圖，不含裡面的公仔以及模型唷\n有什麼疑問都可以直接詢問\n如果覺得裝不起來記得先詢問，不要硬裝哦\n""" + product_detail
+
+    return final_detail
+
+def replaceShopeeDetail(product_detail):
+
+    product_detail = product_detail.replace('展示盒使用高達95%透光度的高透亮亞克力物料製造。主題高清噴繪設計背景，配上LED燈板，提升展品氛圍，同時免受塵封困擾', '')
+    product_detail = re.sub(r'(.*+)同時免受塵封困擾', r'', product_detail)
+    
+    product_detail = product_detail.replace('brand:AOWOBOX', '')
+    product_detail = product_detail.replace('brand:', '')
+    product_detail = product_detail.replace('AOWOBOX', '')
+
+    product_detail = product_detail.replace(' ', '')
+    product_detail = product_detail.replace('高達', '鋼彈')
+    product_detail = product_detail.replace('手辦', '專用')
+    product_detail = product_detail.replace('AOWOBOX', '阿庫力')
+    product_detail = product_detail.replace('Good Smile', '好微笑')
+    product_detail = product_detail.replace('良笑社', '')
+    product_detail = product_detail.replace('高透主題展示盒', '')
+    product_detail = product_detail.replace('高透射燈主題展示盒', '')   
+    product_detail = product_detail.replace('material', '材質')
+    product_detail = product_detail.replace('powersupply', '電源')
+    product_detail = product_detail.replace('款式選擇', '規格細節')
+    product_detail = product_detail.replace(':', '：')
+
+    # product_detail 使用 re 取代 
+    # from size:W25 cm D20cm H30cm
+    # to 尺寸: 長30cm 寬25cm 高45cm
+    product_detail = product_detail.replace('size', '尺寸')   
+    product_detail = product_detail.replace('Size', '尺寸')   
+    product_detail = re.sub(r'W(\d+)cm', r'寬\1cm', product_detail)
+    product_detail = re.sub(r'H(\d+)cm', r'高\1cm', product_detail)
+    product_detail = re.sub(r'D(\d+)cm', r'長\1cm', product_detail)
+    product_detail = re.sub(r'W(\d+)', r'寬\1', product_detail)
+    product_detail = re.sub(r'H(\d+)', r'高\1', product_detail)
+    product_detail = re.sub(r'D(\d+)', r'長\1', product_detail)
+    product_detail = re.sub(r'鋼彈(\d+)%', r'高達\1%', product_detail)
+    product_detail = product_detail.replace('cm','公分')
+    product_detail = product_detail.replace('\t','')
     product_detail = product_detail.replace('\n','<br/>')
     
     product_detail = re.sub(r'(<br\s*/?>\s*){3,}', '<br/><br/>', product_detail, flags=re.IGNORECASE)
     product_detail = re.sub(r'.*同時免受塵封困擾<br/>', '', product_detail)
 
-    final_detail = """<div class="notice"><h3>📕請先閱讀注意事項再下單哦</h3><ol><li>商品寄送需要等待清關，預計 20 天內會寄到您手上</li><li>請一定要確認填寫資料的正確性，不然重寄會需要等待哦</li><li>因為超商取貨有尺寸限制，所以只能透過宅配運送</li><li>圖片是參考用的示意圖，不含裡面的公仔以及模型唷</li><li>有什麼疑問都可以直接詢問</li><li>如果覺得裝不起來記得先詢問，不要硬裝哦</li></ol></div>""" + product_detail
+    final_detail = """📕請先閱讀注意事項再下單哦\n商品寄送需要等待清關，預計 20 天內會寄到您手上\n請一定要確認填寫資料的正確性，不然重寄會需要等待哦\n因為超商取貨有尺寸限制，所以只能透過宅配運送\n圖片是參考用的示意圖，不含裡面的公仔以及模型唷\n有什麼疑問都可以直接詢問\n如果覺得裝不起來記得先詢問，不要硬裝哦</li></ol></div>""" + product_detail
 
     return final_detail
 

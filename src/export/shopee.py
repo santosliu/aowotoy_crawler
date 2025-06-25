@@ -4,7 +4,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 import mysql.connector
 from dotenv import load_dotenv
-from src.utils.common import genSign, raisedPrice, replaceTitle, replaceDetail, replaceOption, getProductResponse
+from src.utils.common import genSign, raisedPrice, replaceTitle, replaceShopeeDetail, replaceOption, getProductResponse
 from src.utils.db import connect_to_db,getProductOptionsByProductId
 
 # Load environment variables from .env file
@@ -66,6 +66,7 @@ def export_all_csv(output_filename):
             writer = csv.writer(f)
             writer.writerow(column_names)
 
+            product_serial = 0
             # 輸出資料至 CSV
             for i, row in enumerate(rows):
                 
@@ -81,8 +82,9 @@ def export_all_csv(output_filename):
                 if product_options_data is None:
                     print(f"未找到產品 {product_id} 的選項資料。")
                     continue
-
-                option_serial = 0
+                
+                product_serial = product_serial + 1
+                
                 for option in product_options_data:
 
                     product_name = option['name']
@@ -115,57 +117,27 @@ def export_all_csv(output_filename):
                         product_option = product_option.replace('only for Display Box, NOT include the exhibit+ ','')
                         product_option = product_option.replace('(只有展盒 不含模型)','')
                         
-                        option_serial = option_serial + 1
-                        # 檢查 product_option 有沒有 + 號
-                        if '+' in product_option:
-                            # 使用 + 號分隔 option
-                            options = product_option.split('+')
-
-                            # 我只要第一和第二個 option，分別命名為 spec_name 和 item_name
-                            spec_name = options[0].strip()
-                            item_name = options[1].strip()
-                            
-                            transformed_row = [
-                                '101385',
-                                replaceTitle(product_name),
-                                replaceDetail(product_detail),
-                                '1',
-                                str(product_id),
-                                option_serial, # 同商品規格流水號(F)
-                                item_name,
-                                spec_name,
-                                '', # 首圖?(I)
-                                '',
-                                '',
-                                raisedPrice(option['price']) , # 價格(L)
-                                '10', # 庫存 (M)                        
-                                option_id, # 商品選項貨號 (N)
-                                '',
-                                '',
-                                '00',
-                            ]
-
-                        else:
-                            
-                            transformed_row = [
-                                '101385',
-                                replaceTitle(product_name),
-                                replaceDetail(product_detail),
-                                '1',
-                                str(product_id),
-                                option_serial, # 同商品規格流水號(F)
-                                product_option,
-                                '',
-                                '', # 首圖?(I)
-                                '',
-                                '',
-                                raisedPrice(option['price']) , # 價格(L)
-                                '10', # 庫存 (M)                        
-                                option_id, # 商品選項貨號 (N)
-                                '',
-                                '',
-                                '00',                                
-                            ]
+                        
+                        
+                        transformed_row = [
+                            '101385',
+                            replaceTitle(product_name),
+                            replaceShopeeDetail(product_detail),
+                            '1',
+                            str(product_id),
+                            product_serial, # 同商品規格流水號(F)
+                            '燈箱款式',
+                            product_option,
+                            '', # 首圖?(I)
+                            '',
+                            '',
+                            raisedPrice(option['price']) , # 價格(L)
+                            '10', # 庫存 (M)                        
+                            option_id, # 商品選項貨號 (N)
+                            '',
+                            '',
+                            '00',                                
+                        ]
 
                         image_count = get_image_count(product_id)
                         
