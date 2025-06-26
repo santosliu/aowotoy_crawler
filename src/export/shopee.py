@@ -88,6 +88,7 @@ def export_all_csv(output_filename):
                 for option in product_options_data:
 
                     product_name = option['name']
+                    product_detail = option['detail']
                     
                     if product_name and ("解放玩具" in product_name):
                         print(f"產品名稱包含 '解放玩具'，跳過匯出：{product_name}")

@@ -172,13 +172,11 @@ def replaceShopeeDetail(product_detail):
     product_detail = re.sub(r'D(\d+)', r'長\1', product_detail)
     product_detail = re.sub(r'鋼彈(\d+)%', r'高達\1%', product_detail)
     product_detail = product_detail.replace('cm','公分')
-    product_detail = product_detail.replace('\t','')
-    product_detail = product_detail.replace('\n','<br/>')
     
-    product_detail = re.sub(r'(<br\s*/?>\s*){3,}', '<br/><br/>', product_detail, flags=re.IGNORECASE)
+    product_detail = re.sub(r'(<br\s*/?>\s*){3,}', '\n\n', product_detail, flags=re.IGNORECASE)
     product_detail = re.sub(r'.*同時免受塵封困擾<br/>', '', product_detail)
-
-    final_detail = """📕請先閱讀注意事項再下單哦\n商品寄送需要等待清關，預計 20 天內會寄到您手上\n請一定要確認填寫資料的正確性，不然重寄會需要等待哦\n因為超商取貨有尺寸限制，所以只能透過宅配運送\n圖片是參考用的示意圖，不含裡面的公仔以及模型唷\n有什麼疑問都可以直接詢問\n如果覺得裝不起來記得先詢問，不要硬裝哦</li></ol></div>""" + product_detail
+    
+    final_detail = """📕請先閱讀注意事項再下單哦\n商品寄送需要等待清關，預計 20 天內會寄到您手上\n請一定要確認填寫資料的正確性，不然重寄會需要等待哦\n因為超商取貨有尺寸限制，所以只能透過宅配運送\n圖片是參考用的示意圖，不含裡面的公仔以及模型唷\n有什麼疑問都可以直接詢問\n如果覺得裝不起來記得先詢問，不要硬裝哦""" + product_detail
 
     return final_detail
 
