@@ -65,7 +65,8 @@ def export_all_csv():
 
         product_id_counter = 0
         file_batch_number = 1
-        batch_size = 50
+        batch_size = 1200
+        
         product_serial = 0 
 
         # 輸出資料至 CSV
