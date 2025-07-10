@@ -77,7 +77,7 @@ def process_upload():
 if __name__ == '__main__':
 
     count = 0
-    for i in range(100):
+    for i in range(200):
         process_upload()
         count = count+1
         logging.info(f'已替 {count} 件商品上圖')

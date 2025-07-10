@@ -16,6 +16,8 @@
 
 No data fetched for product_id 66c4420fd2f6d7001f6b1c9b
 
+--
+
 定期檢查新商品 (抓圖後執行 resize.py 處理圖片大小)
 
 定期檢查舊商品商品修改狀況 (圖片不用重抓)

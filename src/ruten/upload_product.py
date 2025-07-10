@@ -191,10 +191,11 @@ def process_upload():
 if __name__ == '__main__':
 
     """
-    之後加個迴圈，一次上 10 筆吧？
+    之後加個迴圈，一次上 50 筆
+    上的時候順便看狀況
     """
     count = 0
-    for i in range(20):
+    for i in range(50):
         process_upload()
         count = count+1
         logging.info(f'已上架 {count} 件商品')        
