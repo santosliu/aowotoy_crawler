@@ -81,11 +81,17 @@ def process_upload():
     products_to_upload = getProductsWithoutPublish()
     
     spec_info_list = [] 
+    
 
     if products_to_upload:        
 
+        # 預設定義以免後續出包
+        store_class_id = '6529088'
+        product_price = '9999999'
+
         for item in products_to_upload:
-            
+            skip = 0
+
             product = item # 直接使用 item，因為它已經是字典或類似字典的對象
             
             # 根據產品名稱處理行為
@@ -94,8 +100,9 @@ def process_upload():
             
             if product_name and ("預購" in product_name or "預售" in product_name or "解放玩具" in product_name):
                 print(f"產品名稱包含 '預購' '預售' '解放玩具'，跳過匯出：{product_name}")
+                skip = 1
                 continue # 使用 continue 跳過當前迴圈的剩餘部分，繼續下一個產品
-
+            
             store_class_id = '6529089' if '泡泡瑪特' in product_name else '6529088' # 轉換類別
             product_price = raisedPrice(product.get('price')) 
 
@@ -134,7 +141,7 @@ def process_upload():
 
                     try:
                         spec_info_list.append({
-                            'spec_name': replaceOption(spec_name),
+                            'spec_name': replaceOption(spec_name)[:15],
                             'item_name': replaceOption(item_name), 
                             'status': True,
                             'price': product_price,
@@ -149,7 +156,7 @@ def process_upload():
                 else:
                     try:
                         spec_info_list.append({
-                            'spec_name': replaceOption(product_option),
+                            'spec_name': replaceOption(product_option)[:15],
                             'status': True,
                             'price': product_price,
                             'qty': 10,
@@ -183,7 +190,8 @@ def process_upload():
 
         logging.info(f"轉換後的產品資料: {json.dumps(product_data, ensure_ascii=False, indent=2)}")
         
-        upload_product(product_data) 
+        if skip == 0:
+            upload_product(product_data) 
 
     else:
         logging.info("沒有產品資料可供上傳。")
@@ -198,6 +206,4 @@ if __name__ == '__main__':
     for i in range(50):
         process_upload()
         count = count+1
-        logging.info(f'已上架 {count} 件商品')        
-
-    
+        logging.info(f'已上架 {count} 件商品')
