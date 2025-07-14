@@ -18,9 +18,18 @@ No data fetched for product_id 66c4420fd2f6d7001f6b1c9b
 
 --
 
-定期檢查新商品 (抓圖後執行 resize.py 處理圖片大小)
+手動處理好了
+每兩周作一次
 
-定期檢查舊商品商品修改狀況 (圖片不用重抓)
+定期檢查新商品
+python src/aowotoy_latest.py 
 
-定期 rclone sync
+執行 resize.py 處理圖片大小
+python src/utils/resize.py
+
+定期 rclone sync 到 cloudflare 上
 D:\Code\aowotoy_crawler>D:\Dropbox\01_工具程式\rclone-v1.69.3-windows-amd64\rclone sync products r2:toy --progress -v
+
+輸出成 Shopee + Jolly 用 CSV
+執行 ruten/upload_product，ruten/upload_picture
+

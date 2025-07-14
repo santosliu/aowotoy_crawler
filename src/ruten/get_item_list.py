@@ -1,3 +1,9 @@
+"""
+
+取得露天所有品項
+
+"""
+
 import time
 import hmac
 import hashlib

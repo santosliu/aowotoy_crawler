@@ -1,7 +1,10 @@
 """
 縮小過大的圖片
+
 超過 1024kb 就縮
 要縮到 1024kb
+
+低於 1024kb 就不縮
 
 """
 
@@ -17,6 +20,10 @@ for root, dirs, files in os.walk(products_dir):
     for file in files:
         file_path = os.path.join(root, file)
         file_size = os.path.getsize(file_path)
+        # 檔案低於 512KB 的不縮減
+        if file_size < 512 * 1024:
+            print(f'路徑：{file_path}，檔案大小：{file_size}，低於 512KB，不縮減')
+            continue
         if file_size > 1024 * 1024:
             print(f'路徑：{file_path}，檔案大小：{file_size}')
 
