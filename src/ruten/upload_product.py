@@ -203,7 +203,7 @@ if __name__ == '__main__':
     上的時候順便看狀況
     """
     count = 0
-    for i in range(50):
+    for i in range(5):
         process_upload()
         count = count+1
         logging.info(f'已上架 {count} 件商品')

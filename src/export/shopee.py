@@ -11,7 +11,7 @@ from src.utils.db import connect_to_db,getProductOptionsByProductId
 load_dotenv()
 
 # CSV file name
-csv_file = 'shopee_goods.csv'
+csv_file = 'shopee.csv'
 
 def get_image_count(product_id):
     """抓取 /products/{product_id} 目錄底下的檔案數量。"""
@@ -53,7 +53,8 @@ def export_all_csv():
 
         cursor.execute("""
             SELECT product_id 
-            FROM aowotoy_products            
+            FROM aowotoy_products   
+            WHERE id > 7296         
             """)
 
         rows = cursor.fetchall()
@@ -65,7 +66,7 @@ def export_all_csv():
 
         product_id_counter = 0
         file_batch_number = 1
-        batch_size = 1200
+        batch_size = 300
         
         product_serial = 0 
 

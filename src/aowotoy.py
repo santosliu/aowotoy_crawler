@@ -213,15 +213,18 @@ async def main():
 
     try:
         
-        for page in range(1, max_page+1):  
-            url = f"{base_url}{page}"
-            print(f"開始從 {url} 爬取資料...")
-            list = await crawl_list(url)
-            data = data+list            
+        # for page in range(1, max_page+1):  
+        #     url = f"{base_url}{page}"
+        #     print(f"開始從 {url} 爬取資料...")
+        #     list = await crawl_list(url)
+        #     data = data+list            
         
         # 測試用內容
-        # data = []
-        # data.append("https://www.aowotoys.com/products/aowobox-pop-mart-dimoo-whisper-of-the-rose-figure-theme-display-box?locale=zh-hant") 
+        data = []
+        data.append("https://www.aowotoys.com/products/aowobox-taito-wanderingwitchthejourneyofelaina-grape-displaybox?locale=zh-hant") 
+        data.append("https://www.aowotoys.com/products/aowobox-taito-wanderingwitchthejourneyofelaina-elaina-witchwear-displaybox?locale=zh-hant")
+        data.append("https://www.aowotoys.com/products/aowobox-taito-wanderingwitchthejourneyofelaina-elaina-catear-displaybox?locale=zh-hant")
+        data.append("https://www.aowotoys.com/products/aowobox-taito-amp-rascaldoesnotdream-sakurajima-mai-bunny-displaybox?locale=zh-hant")
 
         if data: # 確保有資料才繼續
             print("開始爬取文章內容、圖片並即時寫入資料庫...")

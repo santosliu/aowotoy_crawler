@@ -80,7 +80,11 @@ def export_csv_by_product_id(product_id):
 
         cursor = conn.cursor()
 
-        cursor.execute("SELECT name, price, option , detail FROM aowotoy_options WHERE product_id = %s", (product_id,))
+        cursor.execute("""
+        SELECT name, price, option , detail 
+        FROM aowotoy_options 
+        WHERE product_id = %s
+        """, (product_id,))
 
         rows = cursor.fetchall()
 
@@ -172,7 +176,10 @@ def get_products():
             return []
 
         cursor = conn.cursor()
-        cursor.execute("SELECT product_id FROM aowotoy_products")
+        cursor.execute("""
+        SELECT product_id FROM aowotoy_products
+        WHERE id >= 7297
+        """)
         products = [row[0] for row in cursor.fetchall()]
         return products
     except mysql.connector.Error as e:
