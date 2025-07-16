@@ -18,7 +18,7 @@ import json
 import requests
 import logging
 from dotenv import load_dotenv
-from src.utils.common import genSign, raisedPrice, replaceTitle, replaceDetail, replaceOption, getProductResponse
+from src.utils.common import genSign, raisedPrice, replaceTitle, replaceRutenDetail, replaceOption, getProductResponse
 from src.utils.db import getProductsWithoutPublish,setProductPublished
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -173,7 +173,7 @@ def process_upload():
             'store_class_id': store_class_id,
             'condition': 1, 
             'stock_status': '21DAY', 
-            'description': replaceDetail(str(product.get('detail', ''))), # 確保 detail 是字串
+            'description': replaceRutenDetail(str(product.get('detail', ''))), # 確保 detail 是字串
             'video_link': '',
             'location_type': 1, # 預設為 1 (台灣)
             'location': '03', # 預設為 03 (新北市)

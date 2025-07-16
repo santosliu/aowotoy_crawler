@@ -28,8 +28,10 @@ python src/aowotoy_latest.py
 python src/utils/resize.py
 
 定期 rclone sync 到 cloudflare 上
-D:\Code\aowotoy_crawler>D:\Dropbox\01_工具程式\rclone-v1.69.3-windows-amd64\rclone sync products r2:toy --progress -v
+D:\Code\aowotoy_crawler>
+D:\Dropbox\01_工具程式\rclone-v1.69.3-windows-amd64\rclone sync products r2:toy --progress -v
 
 輸出成 Shopee + Jolly 用 CSV
 執行 ruten/upload_product，ruten/upload_picture
+
 

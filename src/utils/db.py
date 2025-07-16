@@ -36,9 +36,8 @@ def getProductsWithoutPicture():
 
             sql = """
             SELECT * FROM aowotoy_products
-            WHERE ruten_id IS NOT NULL 
+            WHERE ruten_id != 100 
             AND image_counts IS NULL
-            AND ruten_id > '1000000'
             LIMIT 1
             """
             cursor.execute(sql)

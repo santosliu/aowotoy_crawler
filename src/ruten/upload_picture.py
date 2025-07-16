@@ -38,7 +38,7 @@ def process_upload():
 
     # 取得已經上架但是還沒上圖片的項目
     ruten_id, product_id = getProductsWithoutPicture()
-    
+    print(ruten_id)
     payload = {
         'item_id': ruten_id
     }
@@ -69,6 +69,7 @@ def process_upload():
 
     # 解析 JSON 字串
     response_data = json.loads(response.text)
+    print(response_data)
     success_images_count = response_data['data']['success_images']
     
     # 回寫資訊到 db
