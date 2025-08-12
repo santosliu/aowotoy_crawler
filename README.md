@@ -16,22 +16,30 @@
 
 No data fetched for product_id 66c4420fd2f6d7001f6b1c9b
 
+
+
+20250813 start from optionId 16204 productId 9387
 --
 
-手動處理好了
-每兩周作一次
+## 手動處理
 
-定期檢查新商品
-python src/aowotoy_latest.py 
+- 每兩周作一次
 
-執行 resize.py 處理圖片大小
-python src/utils/resize.py
-
-定期 rclone sync 到 cloudflare 上
-D:\Code\aowotoy_crawler>
-D:\Dropbox\01_工具程式\rclone-v1.69.3-windows-amd64\rclone sync products r2:toy --progress -v
-
-輸出成 Shopee + Jolly 用 CSV
-執行 ruten/upload_product，ruten/upload_picture
-
+- 定期檢查新商品
+  - python src/aowotoy_latest.py 
+- 執行 resize.py 處理圖片大小
+  - python src/utils/resize.py
+- 處理完之後 rename
+  - python src/utils/rename.py
+- 定期 rclone sync 到 cloudflare 上
+  - cd Code\aowotoy_crawler>
+  - D:\Dropbox\01_工具程式\rclone-v1.69.3-windows-amd64\rclone sync products r2:toy --progress -v
+- 輸出成 Shopee + Jolly 用 CSV
+  - 輸出前記得調整輸出範圍 by product_id
+  - python -m src.export.jolly
+  - python -m src.export.shopee
+- shopee + jolly 確認完成後再處理 ruten
+- 上傳到 Ruten
+  - python ruten/upload_product
+  - python ruten/upload_picture
 

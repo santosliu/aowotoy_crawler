@@ -54,7 +54,7 @@ def export_all_csv():
         cursor.execute("""
             SELECT product_id 
             FROM aowotoy_products   
-            WHERE id > 7296         
+            WHERE id > 9387         
             """)
 
         rows = cursor.fetchall()
@@ -80,7 +80,7 @@ def export_all_csv():
                     f.close()
                     print(f"Batch {file_batch_number-1} completed.")
                 
-                current_csv_file = os.path.join('output', f'shopee_product_{file_batch_number}.csv')
+                current_csv_file = os.path.join('output', f'shopee_{file_batch_number}.csv')
                 f = open(current_csv_file, 'w', newline='', encoding='utf-8-sig')
                 writer = csv.writer(f)
                 writer.writerow(column_names)

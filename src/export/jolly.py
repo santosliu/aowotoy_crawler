@@ -33,7 +33,7 @@ def connect_to_db():
 
 def check_csv():
     """刪除舊的 CSV 檔案並創建一個新的空檔案。"""
-    csv_path = os.path.join('doc', csv_file)
+    csv_path = os.path.join('output', csv_file)
     if os.path.exists(csv_path):
         try:
             os.remove(csv_path)
@@ -159,7 +159,7 @@ def export_csv_by_product_id(product_id):
         row += option_string
 
     # 打開 jolly.csv 並且 append 進入    
-    csv_path = os.path.join('doc', csv_file)
+    csv_path = os.path.join('output', csv_file)
     try:
         with open(csv_path, 'a', newline='', encoding='utf-8-sig') as f:
             f.write(row + '\n')
@@ -178,7 +178,7 @@ def get_products():
         cursor = conn.cursor()
         cursor.execute("""
         SELECT product_id FROM aowotoy_products
-        WHERE id >= 7297
+        WHERE id > 9387
         """)
         products = [row[0] for row in cursor.fetchall()]
         return products
