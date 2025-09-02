@@ -19,6 +19,7 @@ No data fetched for product_id 66c4420fd2f6d7001f6b1c9b
 
 
 20250813 start from optionId 16204 productId 9387
+20250902 start from optionID 17246 productId 10435
 --
 
 ## 手動處理
@@ -32,7 +33,8 @@ No data fetched for product_id 66c4420fd2f6d7001f6b1c9b
 - 處理完之後 rename
   - python src/utils/rename.py
 - 定期 rclone sync 到 cloudflare 上
-  - cd Code\aowotoy_crawler>
+  - 開啟終端處理
+  - 切換到 aowotoy_crawler 目錄之後
   - D:\Dropbox\01_工具程式\rclone-v1.69.3-windows-amd64\rclone sync products r2:toy --progress -v
 - 輸出成 Shopee + Jolly 用 CSV
   - 輸出前記得調整輸出範圍 by product_id
@@ -40,6 +42,6 @@ No data fetched for product_id 66c4420fd2f6d7001f6b1c9b
   - python -m src.export.shopee
 - shopee + jolly 確認完成後再處理 ruten
 - 上傳到 Ruten
-  - python ruten/upload_product
-  - python ruten/upload_picture
+  - python src/ruten/upload_product
+  - python src/ruten/upload_picture
 

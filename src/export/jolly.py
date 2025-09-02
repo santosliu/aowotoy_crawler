@@ -178,7 +178,7 @@ def get_products():
         cursor = conn.cursor()
         cursor.execute("""
         SELECT product_id FROM aowotoy_products
-        WHERE id > 9387
+        WHERE id > 10435
         """)
         products = [row[0] for row in cursor.fetchall()]
         return products

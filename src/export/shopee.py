@@ -54,7 +54,7 @@ def export_all_csv():
         cursor.execute("""
             SELECT product_id 
             FROM aowotoy_products   
-            WHERE id > 9387         
+            WHERE id > 10435         
             """)
 
         rows = cursor.fetchall()
