@@ -54,7 +54,7 @@ def export_all_csv():
         cursor.execute("""
             SELECT product_id 
             FROM aowotoy_products   
-            WHERE id > 10435         
+            WHERE id > 11254         
             """)
 
         rows = cursor.fetchall()
@@ -111,6 +111,10 @@ def export_all_csv():
                 if product_name and ("解放玩具" in product_name):
                     print(f"產品名稱包含 '解放玩具'，跳過匯出：{product_name}")
                     continue 
+
+                if product_name and ("泡泡" not in product_name):
+                    print(f"20250913 需求：產品名稱無 '泡泡' 即跳過匯出：{product_name}")
+                    continue 
                                     
                 option_value = option['option'] 
                 option_id = option['option_id']
@@ -127,7 +131,7 @@ def export_all_csv():
                         continue
 
                     # 只要是泡泡瑪特，就不上架 「無燈厚底版」 與 「底1燈版(USB)」
-                    if product_name and ("泡泡馬特" in product_name) and ('無燈厚底版' in product_option or '底1燈版(USB)' in product_option):
+                    if product_name and ("泡泡" in product_name) and ('無燈厚底版' in product_option or '底1燈版(USB)' in product_option):
                         print(f'品項為泡泡瑪特，不上架「無燈厚底版」 與 「底1燈版(USB)」')
                         print(f'品項：{product_option}')
                         continue

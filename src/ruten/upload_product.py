@@ -102,6 +102,11 @@ def process_upload():
                 print(f"產品名稱包含 '預購' '預售' '解放玩具'，跳過匯出：{product_name}")
                 skip = 1
                 continue # 使用 continue 跳過當前迴圈的剩餘部分，繼續下一個產品
+
+            if product_name and ("泡泡" not in product_name):
+                print(f"20250913 產品名稱不包含 '泡泡'，即跳過匯出：{product_name}")
+                skip = 1
+                continue # 使用 continue 跳過當前迴圈的剩餘部分，繼續下一個產品
             
             store_class_id = '6529089' if '泡泡瑪特' in product_name else '6529088' # 轉換類別
             product_price = raisedPrice(product.get('price')) 

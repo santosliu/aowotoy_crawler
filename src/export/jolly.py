@@ -123,7 +123,12 @@ def export_csv_by_product_id(product_id):
 
     # 如果 product_name 有 預購 或者 解放玩具 就跳出
     if "預購" in product_name or"預售" in product_name or "解放玩具" in product_name:
-        # print(f"產品名稱包含 '預購' '預售' '解放玩具'，跳過匯出：{product_name}")
+        print(f"產品名稱包含 '預購' '預售' '解放玩具'，跳過匯出：{product_name}")
+        return
+    
+    # 如果 product_name 沒有 泡泡 就跳出
+    if "泡泡" not in product_name:
+        print(f"20250913 調整：產品名稱不包含 '泡泡'，跳過匯出：{product_name}")
         return
 
     # 取代文字
@@ -178,7 +183,7 @@ def get_products():
         cursor = conn.cursor()
         cursor.execute("""
         SELECT product_id FROM aowotoy_products
-        WHERE id > 10435
+        WHERE id > 11254
         """)
         products = [row[0] for row in cursor.fetchall()]
         return products

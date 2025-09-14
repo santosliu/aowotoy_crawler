@@ -42,6 +42,6 @@ No data fetched for product_id 66c4420fd2f6d7001f6b1c9b
   - python -m src.export.shopee
 - shopee + jolly 確認完成後再處理 ruten
 - 上傳到 Ruten
-  - python src/ruten/upload_product
-  - python src/ruten/upload_picture
+  - python -m src.ruten.upload_product
+  - python -m src.ruten.upload_picture
 
