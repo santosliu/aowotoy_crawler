@@ -181,10 +181,13 @@ def get_products():
             return []
 
         cursor = conn.cursor()
+
+        current_product_id = os.getenv("CURRENT_PRODUCT_ID")
+
         cursor.execute("""
         SELECT product_id FROM aowotoy_products
-        WHERE id > 11254
-        """)
+        WHERE id > %s
+        """, (current_product_id,))
         products = [row[0] for row in cursor.fetchall()]
         return products
     except mysql.connector.Error as e:

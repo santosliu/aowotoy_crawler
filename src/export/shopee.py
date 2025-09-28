@@ -51,10 +51,11 @@ def export_all_csv():
 
         cursor = conn.cursor()
 
-        cursor.execute("""
+        current_product_id = os.getenv('CURRENT_PRODUCT_ID', '0')
+        cursor.execute(f"""
             SELECT product_id 
             FROM aowotoy_products   
-            WHERE id > 11254         
+            WHERE id > {current_product_id}
             """)
 
         rows = cursor.fetchall()

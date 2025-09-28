@@ -20,6 +20,8 @@ No data fetched for product_id 66c4420fd2f6d7001f6b1c9b
 
 20250813 start from optionId 16204 productId 9387
 20250902 start from optionID 17246 productId 10435
+20250913 start from 18063, 11254
+20250928 start from 18661, 11852
 --
 
 ## 手動處理
