@@ -254,3 +254,71 @@ def getProductOptionsByProductId(product_id):
             cursor.close()
         if mydb:
             mydb.close()
+
+def setTaobaoProduct(products):
+    """將多筆淘寶產品資料寫入資料庫"""
+    mydb = None
+    cursor = None
+    try:
+        mydb = connect_to_db()
+        if mydb:
+            cursor = mydb.cursor()
+            sql = """
+            INSERT INTO taobao_products (product_id, product_url, product_name, feature_image, image_list)
+            VALUES (%s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                product_url = VALUES(product_url),
+                product_name = VALUES(product_name),
+                feature_image = VALUES(feature_image),
+                image_list = VALUES(image_list)
+            """
+            cursor.executemany(sql, products)
+            mydb.commit()
+            print(f"已成功寫入或更新 {cursor.rowcount} 筆產品資料。")
+            return True
+        else:
+            print("無法連接到資料庫，無法寫入產品資料。")
+            return False
+    except mysql.connector.Error as err:
+        print(f"寫入淘寶產品資料失敗: {err}")
+        return False
+    except Exception as e:
+        print(f"寫入淘寶產品資料時發生未知錯誤: {e}")
+        return False
+    finally:
+        if cursor:
+            cursor.close()
+        if mydb:
+            mydb.close()
+
+def checkTaobaoProductID(product_id):
+    """檢查淘寶 product_id 是否已存在於資料庫中"""
+    mydb = None
+    cursor = None
+    try:
+        mydb = connect_to_db()
+        if mydb:
+            cursor = mydb.cursor()
+            sql = "SELECT COUNT(*) FROM taobao_products WHERE product_id = %s"
+            cursor.execute(sql, (product_id,))
+            result = cursor.fetchone()
+            # 如果計數大於 0，表示 product_id 已存在
+            if result[0] > 0:
+                return True
+            else:
+                return False
+        else:
+            print("無法連接到資料庫，無法檢查產品 ID。")
+            # 根據需求，這裡可以返回 True 以阻止後續操作，或引發異常
+            return True
+    except mysql.connector.Error as err:
+        print(f"檢查淘寶產品 ID 時發生錯誤: {err}")
+        return True
+    except Exception as e:
+        print(f"檢查淘寶產品 ID 時發生未知錯誤: {e}")
+        return True
+    finally:
+        if cursor:
+            cursor.close()
+        if mydb:
+            mydb.close()
