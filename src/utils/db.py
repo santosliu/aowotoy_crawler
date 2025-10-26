@@ -313,7 +313,7 @@ def checkTaobaoProductID(product_id):
         mydb = connect_to_db()
         if mydb:
             cursor = mydb.cursor()
-            sql = "SELECT COUNT(*) FROM taobao_products WHERE product_id = %s"
+            sql = "SELECT COUNT(*) FROM taobao_products WHERE product_id = %s AND presale = 0"
             cursor.execute(sql, (product_id,))
             result = cursor.fetchone()
             # 如果計數大於 0，表示 product_id 已存在

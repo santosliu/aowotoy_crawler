@@ -213,7 +213,7 @@ async def main():
     try:
         with open("taobao.json", "r", encoding="utf-8") as f:
             taobao_data = json.load(f)
-        items = taobao_data.get("data", {}).get("data", [])
+        items = taobao_data
         print(f"[main] 成功從 taobao.json 載入 {len(items)} 個商品")
     except FileNotFoundError:
         print("[main] 錯誤: 找不到 taobao.json 檔案。")

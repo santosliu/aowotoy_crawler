@@ -49,7 +49,11 @@ No data fetched for product_id 66c4420fd2f6d7001f6b1c9b
 
 ## 淘寶部分
 
-- 
+- 待處理項目
+  - 撈取圖片備用
+  - 輸出到 shopee / jolly / ruten
+
+ 
 - cookie 先登入後手動抓取
   - 但可能也不用抓，只要有登入讓 playwright 能抓到就好
 - 手動到網址抓商品 json 
