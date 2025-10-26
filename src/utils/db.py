@@ -264,9 +264,10 @@ def setTaobaoProduct(products):
         if mydb:
             cursor = mydb.cursor()
             sql = """
-            INSERT INTO taobao_products (product_id, product_url, product_name, feature_image, image_list)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO taobao_products (product_id, presale, product_url, product_name, feature_image, image_list)
+            VALUES (%s, %s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
+                presale = VALUES(presale),
                 product_url = VALUES(product_url),
                 product_name = VALUES(product_name),
                 feature_image = VALUES(feature_image),

@@ -47,3 +47,18 @@ No data fetched for product_id 66c4420fd2f6d7001f6b1c9b
   - python -m src.ruten.upload_product
   - python -m src.ruten.upload_picture
 
+## 淘寶部分
+
+- 
+- cookie 先登入後手動抓取
+  - 但可能也不用抓，只要有登入讓 playwright 能抓到就好
+- 手動到網址抓商品 json 
+  - https://shop35283664.world.taobao.com/?spm=pc_detail.30350276.shop_block.dshopinfo.11b4394ehKU68R
+  - 先切換標籤到新品
+  - 找 xhr 的部分
+  - 一個 json 24 筆
+  - 參考 url
+  - https://h5api.m.taobao.com/h5/mtop.taobao.shop.simple.fetch/1.0/?jsv=2.6.2&appKey=12574478&t=1761488202162&sign=2c22fe41558d3473d66e7fedcba97363&api=mtop.taobao.shop.simple.fetch&type=originaljson&v=1.0&timeout=10000&dataType=json&sessionOption=AutoLoginAndManualLogin&needLogin=true&LoginRequest=true&jsonpIncPrefix=_1761488202160_&data=%7B%22shopId%22%3A%2235283664%22%2C%22sellerId%22%3A%2272458074%22%7D
+  - https://h5api.m.taobao.com/h5/mtop.taobao.shop.simple.item.fetch/1.0/?jsv=2.6.2&appKey=12574478&t=1761488454194&sign=c40a2edd39abea083e8ec63af1a61d01&api=mtop.taobao.shop.simple.item.fetch&type=originaljson&v=1.0&timeout=10000&dataType=json&sessionOption=AutoLoginAndManualLogin&needLogin=true&LoginRequest=true&jsonpIncPrefix=_1761488454193_&data=%7B%22page%22%3A2%2C%22orderType%22%3A%22popular%22%2C%22sortType%22%3A%22%22%2C%22catId%22%3A0%2C%22keyword%22%3A%22%22%2C%22filterType%22%3A%22%22%2C%22shopId%22%3A%2235283664%22%2C%22sellerId%22%3A%2272458074%22%7D
+  - 把 json 塞進 taobao.json
+- 執行 python -m taobao.py

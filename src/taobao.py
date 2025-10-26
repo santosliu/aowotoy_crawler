@@ -77,6 +77,7 @@ async def get_item_page(url, cookies_json_str, item_id):
 async def get_option_data(data):
     skuBase = data.get('loaderData', {}).get('home', {}).get('data', {}).get('res', {}).get('skuBase', {})
     skuCore = data.get('loaderData', {}).get('home', {}).get('data', {}).get('res', {}).get('skuCore', {})
+    product_presale = 0
                
     if skuBase and 'skus' in skuBase and 'props' in skuBase:
         props_map = {prop['pid']: prop for prop in skuBase.get('props', [])}
@@ -114,6 +115,11 @@ async def get_option_data(data):
                                     print(f"Could not parse price_money: {price_money}")
                                 
                     print(f"SKU ID: {option_data['option_id']}, Option Name: {option_data['name']}, Option Price:{option_data['price']}")
+                    if '预售' in option_data.get('name', ''):
+                        product_presale = 1
+
+    return product_presale
+                    
 
                     
 async def parse_result_html(html_file):
@@ -157,7 +163,7 @@ async def parse_result_html(html_file):
                         print("[parse_result_html] 錯誤: 在指定路徑下找不到 'images' 資料")
                         return "Could not find 'images' data at the specified path."
 
-                    await get_option_data(data)
+                    product_data['product_presale'] = await get_option_data(data)
 
                 except json.JSONDecodeError as e:
                     print(f"[parse_result_html] 錯誤: JSON 解碼失敗: {e}")
@@ -231,6 +237,7 @@ async def main():
             product_data = await parse_result_html(result_html_file)
             
             image_list = product_data.get('image_list') if isinstance(product_data, dict) else None
+            product_presale = product_data.get('product_presale', 0) if isinstance(product_data, dict) else 0
             image_list_json = json.dumps(image_list) if image_list else None
             
             if image_list_json:
@@ -238,7 +245,7 @@ async def main():
             else:
                 print(f"[main] 警告: 未能解析到商品 {item_id} 的圖片列表。解析結果: {product_data}")
 
-            products_to_insert.append((item_id, item_url, item_title, item_feature, image_list_json))
+            products_to_insert.append((item_id, product_presale, item_url, item_title, item_feature, image_list_json))
             print(f"[main] 商品 {item_id} 已加入待寫入資料庫列表")
             
             if products_to_insert:
