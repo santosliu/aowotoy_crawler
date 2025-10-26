@@ -5,12 +5,14 @@ import os
 import re
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
-from .utils.db import setTaobaoProduct, checkTaobaoProductID
+from .utils.db import setTaobaoProduct, checkTaobaoProductID, setTaobaoOption
 
-async def get_item_page(url, cookies_json_str, item_id):
+async def get_item_page(item_data, cookies_json_str):
     """
     Fetches a single Taobao item page using Playwright and saves its content.
     """
+    item_id = item_data.get("itemId")
+    url = item_data.get("itemUrl")
     print(f"--- [get_item_page] 開始執行，商品 ID: {item_id} ---")
     async with async_playwright() as p:
         print("[get_item_page] 啟動 Playwright")
@@ -52,32 +54,33 @@ async def get_item_page(url, cookies_json_str, item_id):
                 os.makedirs(output_dir)
 
             # Save the content to a file
-            file_path = os.path.join(output_dir, f"{item_id}.html")
+            file_path = os.path.join(output_dir, "item_page.html")
             print(f"[get_item_page] 準備將內容儲存至: {file_path}")
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(html_content)
             print(f"[get_item_page] 成功儲存頁面內容至 {file_path}")
             
-            return f"{item_id}.html"
+            return "item_page.html"
 
         except Exception as e:
             print(f"[get_item_page] 爬取過程中發生錯誤 {url}: {e}")
             html_content = await page.content()
-            error_file_path = os.path.join('output', f"{item_id}.html")
+            error_file_path = os.path.join('output', "item_page.html")
             print(f"[get_item_page] 準備將錯誤時的頁面源碼儲存至: {error_file_path}")
             with open(error_file_path, "w", encoding="utf-8") as f:
                 f.write(html_content)
             print(f"[get_item_page] 錯誤頁面源碼已儲存至 {error_file_path}")
-            return f"{item_id}.html"
+            return "item_page.html"
         finally:
             print("[get_item_page] 關閉瀏覽器")
             await browser.close()
             print(f"--- [get_item_page] 執行完畢，商品 ID: {item_id} ---")
 
-async def get_option_data(data):
+async def get_option_data(item_data,data):
     skuBase = data.get('loaderData', {}).get('home', {}).get('data', {}).get('res', {}).get('skuBase', {})
     skuCore = data.get('loaderData', {}).get('home', {}).get('data', {}).get('res', {}).get('skuCore', {})
     product_presale = 0
+    options_to_insert = []
                
     if skuBase and 'skus' in skuBase and 'props' in skuBase:
         props_map = {prop['pid']: prop for prop in skuBase.get('props', [])}
@@ -101,28 +104,44 @@ async def get_option_data(data):
                                 names.append(name)
                 
                 if names:
-                    option_data['name'] = '+'.join(names)
-                    # Here you can process the option_data, e.g., print it or add it to a list
-                    option_data['price'] = 0
+                    option_text = '+'.join(names)
+                    price = 0
                     if skuCore and 'sku2info' in skuCore:
                         sku_id = option_data.get('option_id')
                         if sku_id and sku_id in skuCore['sku2info']:
                             price_money = skuCore['sku2info'][sku_id].get('price', {}).get('priceMoney')
                             if price_money:
                                 try:
-                                    option_data['price'] = int(int(price_money) / 100) * 11
+                                    price = int(int(price_money) / 100) * 11
                                 except (ValueError, TypeError):
                                     print(f"Could not parse price_money: {price_money}")
                                 
-                    print(f"SKU ID: {option_data['option_id']}, Option Name: {option_data['name']}, Option Price:{option_data['price']}")
-                    if '预售' in option_data.get('name', ''):
+                    print(f"SKU ID: {option_data['option_id']}, Option Name: {option_text}, Option Price:{price}")
+                    
+                    option_to_db = (
+                        item_data.get("itemId"),
+                        option_data.get('option_id'),
+                        item_data.get("itemUrl"),
+                        item_data.get("title"),
+                        '', # summary
+                        price,
+                        option_text,
+                        '' # detail
+                    )
+
+                    if '预售' in option_text:
                         product_presale = 1
+                    else:
+                        options_to_insert.append(option_to_db)
+                        product_presale = 0
+        
+        if options_to_insert:
+            setTaobaoOption(options_to_insert)
 
     return product_presale
-                    
 
                     
-async def parse_result_html(html_file):
+async def parse_result_html(item_data, html_file):
     print(f"--- [parse_result_html] 開始執行，檔案: {html_file} ---")
     if not html_file:
         print("[parse_result_html] 錯誤: 未提供 HTML 檔案。")
@@ -163,7 +182,7 @@ async def parse_result_html(html_file):
                         print("[parse_result_html] 錯誤: 在指定路徑下找不到 'images' 資料")
                         return "Could not find 'images' data at the specified path."
 
-                    product_data['product_presale'] = await get_option_data(data)
+                    product_data['product_presale'] = await get_option_data(item_data,data)
 
                 except json.JSONDecodeError as e:
                     print(f"[parse_result_html] 錯誤: JSON 解碼失敗: {e}")
@@ -212,9 +231,14 @@ async def main():
     print("[main] 開始處理商品列表")
     for i, item in enumerate(items):
         print(f"\n[main] --- 正在處理第 {i+1}/{len(items)} 個商品 ---")
-        item_id = item.get("itemId")
-        item_url = item.get("itemUrl")
-        item_title = item.get("title")
+        item_data = {
+            "itemId": item.get("itemId"),
+            "itemUrl": item.get("itemUrl"),
+            "title": item.get("title")
+        }
+        item_id = item_data.get("itemId")
+        item_url = item_data.get("itemUrl")
+        item_title = item_data.get("title")
         item_feature = item.get("image")
         
         if item_id and item_url:
@@ -222,9 +246,11 @@ async def main():
             # Ensure URL has a scheme
             if item_url.startswith('//'):
                 item_url = 'https:' + item_url
+                item_data['itemUrl'] = item_url
                 print(f"[main] URL 已修正為: {item_url}")
             elif not item_url.startswith(('http://', 'https://')):
                  item_url = 'https:' + item_url
+                 item_data['itemUrl'] = item_url
                  print(f"[main] URL 已修正為: {item_url}")
             
             print("[main] 正在檢查資料庫中是否已存在該商品")
@@ -233,8 +259,8 @@ async def main():
                 continue
             print(f"[main] 商品 {item_id} 不在資料庫中，繼續處理。")
 
-            result_html_file = await get_item_page(item_url, cookies_json_str, item_id)
-            product_data = await parse_result_html(result_html_file)
+            result_html_file = await get_item_page(item_data, cookies_json_str)
+            product_data = await parse_result_html(item_data, result_html_file)
             
             image_list = product_data.get('image_list') if isinstance(product_data, dict) else None
             product_presale = product_data.get('product_presale', 0) if isinstance(product_data, dict) else 0
@@ -244,6 +270,7 @@ async def main():
                 print(f"[main] 成功解析到商品 {item_id} 的圖片列表")
             else:
                 print(f"[main] 警告: 未能解析到商品 {item_id} 的圖片列表。解析結果: {product_data}")
+                continue
 
             products_to_insert.append((item_id, product_presale, item_url, item_title, item_feature, image_list_json))
             print(f"[main] 商品 {item_id} 已加入待寫入資料庫列表")
@@ -255,8 +282,8 @@ async def main():
             else:
                 print("[main] 沒有新的商品需要寫入資料庫")
             # Add a delay between requests to be polite
-            print("[main] 等待 5 秒後處理下一個商品")
-            await asyncio.sleep(5)
+            print("[main] 等待 60 秒後處理下一個商品")
+            await asyncio.sleep(60)
         else:
             print(f"[main] 警告: 第 {i+1} 個商品缺少 itemId 或 itemUrl，跳過。")
 

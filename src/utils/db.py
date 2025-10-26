@@ -1,6 +1,7 @@
 import mysql.connector
 import os
 from dotenv import load_dotenv
+from .common import translateChinese
 
 load_dotenv() # 從 .env 文件載入環境變數
 
@@ -260,6 +261,18 @@ def setTaobaoProduct(products):
     mydb = None
     cursor = None
     try:
+        # Translate product names before inserting
+        processed_products = [
+            (
+                p[0], 
+                p[1], 
+                p[2], 
+                translateChinese(p[3]), # Translating product_name
+                p[4], 
+                p[5]
+            ) for p in products
+        ]
+
         mydb = connect_to_db()
         if mydb:
             cursor = mydb.cursor()
@@ -273,7 +286,7 @@ def setTaobaoProduct(products):
                 feature_image = VALUES(feature_image),
                 image_list = VALUES(image_list)
             """
-            cursor.executemany(sql, products)
+            cursor.executemany(sql, processed_products)
             mydb.commit()
             print(f"已成功寫入或更新 {cursor.rowcount} 筆產品資料。")
             return True
@@ -318,6 +331,59 @@ def checkTaobaoProductID(product_id):
     except Exception as e:
         print(f"檢查淘寶產品 ID 時發生未知錯誤: {e}")
         return True
+    finally:
+        if cursor:
+            cursor.close()
+        if mydb:
+            mydb.close()
+
+def setTaobaoOption(options):
+    """將多筆淘寶選項資料寫入資料庫"""
+    mydb = None
+    cursor = None
+    try:
+        # Translate name and option fields before inserting
+        processed_options = [
+            (
+                o[0],  # product_id
+                o[1],  # option_id
+                o[2],  # url
+                translateChinese(o[3]),  # name
+                o[4],  # summary
+                o[5],  # price
+                translateChinese(o[6]),  # option
+                o[7]   # detail
+            ) for o in options
+        ]
+
+        mydb = connect_to_db()
+        if mydb:
+            cursor = mydb.cursor()
+            sql = """
+            INSERT INTO taobao_options (product_id, option_id, url, name, summary, price, `option`, detail)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                product_id = VALUES(product_id),
+                url = VALUES(url),
+                name = VALUES(name),
+                summary = VALUES(summary),
+                price = VALUES(price),
+                `option` = VALUES(`option`),
+                detail = VALUES(detail)
+            """
+            cursor.executemany(sql, processed_options)
+            mydb.commit()
+            print(f"已成功寫入或更新 {cursor.rowcount} 筆選項資料。")
+            return True
+        else:
+            print("無法連接到資料庫，無法寫入選項資料。")
+            return False
+    except mysql.connector.Error as err:
+        print(f"寫入淘寶選項資料失敗: {err}")
+        return False
+    except Exception as e:
+        print(f"寫入淘寶選項資料時發生未知錯誤: {e}")
+        return False
     finally:
         if cursor:
             cursor.close()

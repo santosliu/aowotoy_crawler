@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import json
 from dotenv import load_dotenv
+from opencc import OpenCC
 
 def genSign_compact(url: str, request_body: dict, timestamp: str) -> str:
     """
@@ -183,7 +184,6 @@ def replaceRutenDetail(product_detail):
 
     return final_detail
 
-
 def replaceShopeeDetail(product_detail):
 
     product_detail = product_detail.replace('展示盒使用高達95%透光度的高透亮亞克力物料製造。主題高清噴繪設計背景，配上LED燈板，提升展品氛圍，同時免受塵封困擾\n', '')
@@ -269,3 +269,19 @@ def getProductResponse(json_string):
     except AttributeError as e:
         print(f"屬性錯誤 (可能 JSON 結構不符): {e}")
         return None, None
+
+def translateChinese(text: str) -> str:
+    """
+    將簡體中文轉換為正體中文。
+
+    Args:
+        text (str): 要轉換的簡體中文字符串。
+
+    Returns:
+        str: 轉換後的正體中文字符串。
+    """
+    cc = OpenCC('s2twp')
+    translated_text = cc.convert(text)
+    # 手動轉換標點符號
+    translated_text = translated_text.replace('“', '「').replace('”', '」')
+    return translated_text
